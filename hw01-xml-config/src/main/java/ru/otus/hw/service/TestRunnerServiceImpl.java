@@ -5,10 +5,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TestRunnerServiceImpl implements TestRunnerService {
 
-    private final TestService testService;
+	private final TestService testService;
 
-    @Override
-    public void run() {
-        testService.executeTest();
-    }
+	private final IOService ioService;
+
+	@Override
+	public void run() {
+		try {
+			testService.executeTest();
+		} catch (RuntimeException e) {
+			ioService.printLine("Errors occurred while the application was running:");
+			ioService.printLine(e.getMessage());
+		}
+	}
 }
