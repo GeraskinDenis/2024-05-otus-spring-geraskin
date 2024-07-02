@@ -19,7 +19,7 @@ public class TestRunnerServiceImpl implements TestRunnerService {
 			var student = studentService.determineCurrentStudent();
 			var testResult = testService.executeTestFor(student);
 			resultService.showResult(testResult);
-		} catch (RuntimeException e) {
+		} catch (Exception e) {
 			ioService.printLine(e.getMessage());
 		}
 	}
