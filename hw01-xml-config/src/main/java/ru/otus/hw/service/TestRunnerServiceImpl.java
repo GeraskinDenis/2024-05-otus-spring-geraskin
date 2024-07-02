@@ -13,7 +13,7 @@ public class TestRunnerServiceImpl implements TestRunnerService {
 	public void run() {
 		try {
 			testService.executeTest();
-		} catch (RuntimeException e) {
+		} catch (Exception e) {
 			ioService.printLine("Errors occurred while the application was running:");
 			ioService.printLine(e.getMessage());
 		}
