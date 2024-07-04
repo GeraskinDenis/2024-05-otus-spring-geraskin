@@ -2,6 +2,7 @@ package ru.otus.hw.dao;
 
 import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 import ru.otus.hw.config.TestFileNameProvider;
 import ru.otus.hw.dao.dto.QuestionDto;
 import ru.otus.hw.domain.Question;
@@ -15,45 +16,46 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Repository
 @RequiredArgsConstructor
 public class CsvQuestionDao implements QuestionDao {
-    private final TestFileNameProvider fileNameProvider;
+	private final TestFileNameProvider fileNameProvider;
 
-    @Override
-    public List<Question> findAll() {
-        List<Question> questions;
-        InputStream inputStream = getFileAsStream(fileNameProvider.getTestFileName());
+	@Override
+	public List<Question> findAll() {
+		List<Question> questions;
+		InputStream inputStream = getFileAsStream(fileNameProvider.getTestFileName());
 
-        try (InputStreamReader streamReader = new InputStreamReader(inputStream);
-             BufferedReader reader = new BufferedReader(streamReader)) {
-            questions = new CsvToBeanBuilder<QuestionDto>(reader)
-                    .withType(QuestionDto.class)
-                    .withSkipLines(1)
-                    .withSeparator(';')
-                    .build()
-                    .parse()
-                    .stream()
-                    .map(QuestionDto::toDomainObject)
-                    .collect(Collectors.toList());
-        } catch (IOException | RuntimeException e) {
-            throw new QuestionReadException("Error reading questions", e);
-        }
+		try (InputStreamReader streamReader = new InputStreamReader(inputStream);
+			 BufferedReader reader = new BufferedReader(streamReader)) {
+			questions = new CsvToBeanBuilder<QuestionDto>(reader)
+					.withType(QuestionDto.class)
+					.withSkipLines(1)
+					.withSeparator(';')
+					.build()
+					.parse()
+					.stream()
+					.map(QuestionDto::toDomainObject)
+					.collect(Collectors.toList());
+		} catch (IOException | RuntimeException e) {
+			throw new QuestionReadException("Error reading questions", e);
+		}
 
-        if (questions.isEmpty()) {
-            throw new QuestionReadException("There are no questions in the source.");
-        }
+		if (questions.isEmpty()) {
+			throw new QuestionReadException("There are no questions in the source.");
+		}
 
-        return questions;
-    }
+		return questions;
+	}
 
-    private InputStream getFileAsStream(String fileName) {
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(fileName);
+	private InputStream getFileAsStream(String fileName) {
+		ClassLoader classLoader = getClass().getClassLoader();
+		InputStream inputStream = classLoader.getResourceAsStream(fileName);
 
-        if (Objects.isNull(inputStream)) {
-            throw new QuestionReadException("File not found: " + fileName);
-        }
+		if (Objects.isNull(inputStream)) {
+			throw new QuestionReadException("File not found: " + fileName);
+		}
 
-        return inputStream;
-    }
+		return inputStream;
+	}
 }

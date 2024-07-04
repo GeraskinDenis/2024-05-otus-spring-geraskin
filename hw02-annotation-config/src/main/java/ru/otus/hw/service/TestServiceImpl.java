@@ -1,6 +1,7 @@
 package ru.otus.hw.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.otus.hw.dao.QuestionDao;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
@@ -12,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Service
 @RequiredArgsConstructor
 public class TestServiceImpl implements TestService {
 
@@ -37,7 +39,7 @@ public class TestServiceImpl implements TestService {
 				.collect(Collectors.toMap(e -> atomicInteger.getAndIncrement(), Function.identity()));
 		showQuestion(question);
 		showAnswers(answers);
-		return doGetAnswer(answers);
+		return getAnswer(answers);
 	}
 
 	private void showQuestion(Question question) {
@@ -48,7 +50,7 @@ public class TestServiceImpl implements TestService {
 		answers.forEach((key, value) -> ioService.printFormattedLine("%s. %s", key, value.text()));
 	}
 
-	private Answer doGetAnswer(Map<Integer, Answer> answers) {
+	private Answer getAnswer(Map<Integer, Answer> answers) {
 		int answerNumber = ioService.readIntForRangeWithPrompt(1,
 				answers.size(),
 				"Enter answer number: ",

@@ -2,6 +2,7 @@ package ru.otus.hw.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import ru.otus.hw.domain.Student;
 
 import java.io.ByteArrayInputStream;
@@ -17,8 +18,11 @@ public class StudentServiceImplTest {
 
 	@BeforeEach
 	public void beforeEach() {
-		ioService = new StreamsIOService(mock(PrintStream.class),
-				new ByteArrayInputStream("FirstNameTest\nLastNameTest".getBytes()));
+		IOService ioService = mock(StreamsIOService.class);
+		Mockito.when(ioService.readStringWithPrompt("Please input your first name:"))
+				.thenReturn("FirstNameTest");
+		Mockito.when(ioService.readStringWithPrompt("Please input your last name:"))
+				.thenReturn("LastNameTest");
 		studentService = new StudentServiceImpl(ioService);
 	}
 
@@ -26,6 +30,6 @@ public class StudentServiceImplTest {
 	public void shouldDetermineCurrentStudentCorrectly() {
 		Student expectedStudent = new Student("FirstNameTest", "LastNameTest");
 		Student actualStudent = studentService.determineCurrentStudent();
-		assertThat(actualStudent).isEqualTo(expectedStudent);
+		assertThat(actualStudent).isNotNull().isEqualTo(expectedStudent);
 	}
 }
