@@ -2,3 +2,6 @@
 Есть ли жизнь на Марсе?;Это науке пока не известно%true|Конечно. Красные (НЛО) это с Марса. А зеленые (НЛО) с Венеры%false|Точно нет%false
 Как нужно загружать ресурс из jar в Java?;ClassLoader#geResourceAsStream или ClassPathResource#getInputStream%true|ClassLoader#geResource#getFile + FileReader%false|Wingardium Leviosa%false
 Какой предпочтительный способ реакции на исключения?;@SneakyThrow%false|e.printStackTrace()%false|Проброс дальше с предварительным оборачиванием в бизнес-исключение (например, QuestionReadException)%true|Игнорирование исключения%false
+Какой класс является супер-классом для всех исключений и ошибок?;RuntimeException%false|CompileTimeException%false|Exception%false|Throwable%true
+Когда вызывается конструктор?;Конструктор вызывается перед созданием объекта%false|Конструктор вызывается после создания объекта%false|Конструктор вызывается одновременно, когда продолжается создание объекта%true|Конструктор не может быть вызван%false
+Какие утверждения верны для коллекций?; Set не допускает дублирования элементов%false|List допускает дублирование элементов%false|оба Set и List%true|Ни Set, ни List%false
