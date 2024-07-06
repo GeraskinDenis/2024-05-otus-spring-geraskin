@@ -1,48 +1,37 @@
 package ru.otus.hw.service;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.PrintStream;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class StreamsIOServiceTest {
-
-	private ByteArrayOutputStream outputStream;
+	@Mock
 	private PrintStream printStream;
 	@Mock
 	private InputStream inputStream;
+	@InjectMocks
 	private StreamsIOService streamsIOService;
-
-	@BeforeEach
-	void beforeEach() {
-		outputStream = new ByteArrayOutputStream();
-		printStream = new PrintStream(outputStream);
-		streamsIOService = new StreamsIOService(printStream, inputStream);
-	}
-
-	@AfterEach
-	void afterEach() {
-		printStream.close();
-	}
 
 	@Test
 	void shouldPrintTheLineCorrectly() {
 		String testLine = "TEST LINE";
 		streamsIOService.printLine(testLine);
-		assertThat(outputStream.toString()).isEqualTo(testLine + System.lineSeparator());
+		verify(printStream, times(1)).println(testLine);
 	}
 
 	@Test
-	void shouldPrintTheFormatedLineCorrectly() {
-		String testLine = String.format("%s %s %s", 1, 2, 3);
-		streamsIOService.printFormattedLine("%s %s %s", 1, 2, 3);
-		assertThat(outputStream.toString()).isEqualTo(testLine + System.lineSeparator());
+	void shouldPrintTheFormattedLineCorrectly() {
+		String fmt = "%s %s %s";
+		streamsIOService.printFormattedLine(fmt, 1, 2, 3);
+		verify(printStream, times(1)).printf(fmt + "%n", 1, 2, 3);
 	}
 }
