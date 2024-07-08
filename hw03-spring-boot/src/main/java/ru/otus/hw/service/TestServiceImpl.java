@@ -53,10 +53,11 @@ public class TestServiceImpl implements TestService {
 	}
 
 	private Answer getAnswer(Map<Integer, Answer> answers) {
-		int answerNumber = ioService.readIntForRangeWithPrompt(1,
+		int answerNumber = ioService.readIntForRangeWithPromptLocalized(1,
 				answers.size(),
-				"Enter answer number: ",
-				"You entered an incorrect answer number. Try again:");
+				"TestService.enter.answer.number",
+				"TestService.incorrect.answer",
+				"TestService.interrupted.exceeded.number");
 		return answers.get(answerNumber);
 	}
 

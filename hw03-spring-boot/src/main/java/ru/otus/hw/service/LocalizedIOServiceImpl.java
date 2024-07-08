@@ -32,13 +32,27 @@ public class LocalizedIOServiceImpl implements LocalizedIOService {
 	}
 
 	@Override
-	public int readIntForRange(int min, int max, String errorMessage) {
-		return ioService.readIntForRange(min, max, errorMessage);
+	public int readIntForRange(int min,
+							   int max,
+							   String invalidInputFormatMessage,
+							   String errorMessage) {
+		return ioService.readIntForRange(min,
+				max,
+				invalidInputFormatMessage,
+				errorMessage);
 	}
 
 	@Override
-	public int readIntForRangeWithPrompt(int min, int max, String prompt, String errorMessage) {
-		return ioService.readIntForRangeWithPrompt(min, max, prompt, errorMessage);
+	public int readIntForRangeWithPrompt(int min,
+										 int max,
+										 String prompt,
+										 String invalidInputFormatMessage,
+										 String errorMessage) {
+		return ioService.readIntForRangeWithPrompt(min,
+				max,
+				prompt,
+				invalidInputFormatMessage,
+				errorMessage);
 	}
 
 	@Override
@@ -57,14 +71,22 @@ public class LocalizedIOServiceImpl implements LocalizedIOService {
 	}
 
 	@Override
-	public int readIntForRangeLocalized(int min, int max, String errorMessageCode) {
-		return ioService.readIntForRange(min, max, localizedMessagesService.getMessage(errorMessageCode));
+	public int readIntForRangeLocalized(int min, int max, String invalidInputFormatMessage,
+										String errorMessageCode) {
+		return ioService.readIntForRange(min, max, invalidInputFormatMessage,
+				localizedMessagesService.getMessage(errorMessageCode));
 	}
 
 	@Override
-	public int readIntForRangeWithPromptLocalized(int min, int max, String promptCode, String errorMessageCode) {
-		return ioService.readIntForRangeWithPrompt(min, max,
+	public int readIntForRangeWithPromptLocalized(int min,
+												  int max,
+												  String promptCode,
+												  String invalidInputFormatMessage,
+												  String errorMessageCode) {
+		return ioService.readIntForRangeWithPrompt(min,
+				max,
 				localizedMessagesService.getMessage(promptCode),
+				localizedMessagesService.getMessage(invalidInputFormatMessage),
 				localizedMessagesService.getMessage(errorMessageCode)
 		);
 	}

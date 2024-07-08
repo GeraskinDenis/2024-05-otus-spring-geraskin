@@ -44,7 +44,7 @@ public class StreamsIOService implements IOService {
 	}
 
 	@Override
-	public int readIntForRange(int min, int max, String errorMessage) {
+	public int readIntForRange(int min, int max, String invalidInputFormatMessage, String errorMessage) {
 		for (int i = 0; i < MAX_ATTEMPTS; i++) {
 			try {
 				var stringValue = scanner.nextLine();
@@ -54,15 +54,19 @@ public class StreamsIOService implements IOService {
 				}
 				return intValue;
 			} catch (IllegalArgumentException e) {
-				printLine(errorMessage);
+				printFormattedLine(invalidInputFormatMessage, min, max);
 			}
 		}
-		throw new IllegalArgumentException("Error during reading int value");
+		throw new IllegalArgumentException(errorMessage);
 	}
 
 	@Override
-	public int readIntForRangeWithPrompt(int min, int max, String prompt, String errorMessage) {
+	public int readIntForRangeWithPrompt(int min,
+										 int max,
+										 String prompt,
+										 String invalidInputFormatMessage,
+										 String errorMessage) {
 		printLine(prompt);
-		return readIntForRange(min, max, errorMessage);
+		return readIntForRange(min, max, invalidInputFormatMessage, errorMessage);
 	}
 }

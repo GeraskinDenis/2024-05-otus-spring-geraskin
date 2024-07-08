@@ -1,12 +1,13 @@
 package ru.otus.hw.dao;
 
 import com.opencsv.bean.CsvToBeanBuilder;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.otus.hw.config.TestFileNameProvider;
 import ru.otus.hw.dao.dto.QuestionDto;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.exceptions.QuestionReadException;
+import ru.otus.hw.service.LocalizedMessagesService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,16 +17,23 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Component
 public class CsvQuestionDao implements QuestionDao {
+
+	private final LocalizedMessagesService messagesService;
+
 	private final TestFileNameProvider fileNameProvider;
+
+	public CsvQuestionDao(@Qualifier("LocalizedMessagesServiceImpl") LocalizedMessagesService messagesService,
+						  TestFileNameProvider fileNameProvider) {
+		this.messagesService = messagesService;
+		this.fileNameProvider = fileNameProvider;
+	}
 
 	@Override
 	public List<Question> findAll() {
 		List<Question> questions;
 		InputStream inputStream = getFileAsStream(fileNameProvider.getTestFileName());
-
 		try (InputStreamReader streamReader = new InputStreamReader(inputStream);
 			 BufferedReader reader = new BufferedReader(streamReader)) {
 			questions = new CsvToBeanBuilder<QuestionDto>(reader)
@@ -38,11 +46,12 @@ public class CsvQuestionDao implements QuestionDao {
 					.map(QuestionDto::toDomainObject)
 					.collect(Collectors.toList());
 		} catch (IOException | RuntimeException e) {
-			throw new QuestionReadException("Error reading questions", e);
+			throw new QuestionReadException(messagesService.getMessage(
+					"CsvQuestionDao.exception.error.reading.questions"), e);
 		}
-
 		if (questions.isEmpty()) {
-			throw new QuestionReadException("There are no questions in the source.");
+			throw new QuestionReadException(messagesService.getMessage(
+					"CsvQuestionDao.exception.questions.not.found"));
 		}
 
 		return questions;
@@ -53,7 +62,8 @@ public class CsvQuestionDao implements QuestionDao {
 		InputStream inputStream = classLoader.getResourceAsStream(fileName);
 
 		if (Objects.isNull(inputStream)) {
-			throw new QuestionReadException("File not found: " + fileName);
+			throw new QuestionReadException(messagesService.getMessage(
+					"CsvQuestionDao.exception.questions.source.not.found"));
 		}
 
 		return inputStream;

@@ -9,7 +9,8 @@ public interface IOService {
 
     String readStringWithPrompt(String prompt);
 
-    int readIntForRange(int min, int max, String errorMessage);
+    int readIntForRange(int min, int max, String invalidInputFormatMessage, String errorMessage);
 
-    int readIntForRangeWithPrompt(int min, int max, String prompt, String errorMessage);
+    int readIntForRangeWithPrompt(int min, int max, String prompt,
+                                  String invalidInputFormatMessage, String errorMessage);
 }
