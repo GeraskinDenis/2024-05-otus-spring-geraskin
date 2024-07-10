@@ -2,31 +2,29 @@ package ru.otus.hw.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.otus.hw.domain.Student;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class StudentServiceImplTest {
 
-	@Autowired
-	LocalizedMessagesServiceImpl localizedMessagesService;
+	@Mock
+	private LocalizedIOService localizedIOService;
 
-	@MockBean
-	private StreamsIOService streamsIOService;
-
-	@Autowired
-	private StudentService studentService;
+	@InjectMocks
+	private StudentServiceImpl studentService;
 
 	@BeforeEach
 	public void beforeEach() {
-		when(streamsIOService.readStringWithPrompt(localizedMessagesService.getMessage("StudentService.input.first.name")))
+		when(localizedIOService.readStringWithPromptLocalized("StudentService.input.first.name"))
 				.thenReturn("FirstNameTest");
-		when(streamsIOService.readStringWithPrompt(localizedMessagesService.getMessage("StudentService.input.last.name")))
+		when(localizedIOService.readStringWithPromptLocalized("StudentService.input.last.name"))
 				.thenReturn("LastNameTest");
 	}
 

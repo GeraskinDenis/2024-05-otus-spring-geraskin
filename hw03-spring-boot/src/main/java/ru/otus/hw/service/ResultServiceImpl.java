@@ -31,3 +31,4 @@ public class ResultServiceImpl implements ResultService {
         ioService.printLineLocalized("ResultService.fail.test");
     }
 }
+

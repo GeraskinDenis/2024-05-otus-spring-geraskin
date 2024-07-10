@@ -3,8 +3,8 @@ package ru.otus.hw.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class LocalizedIOServiceImpl implements LocalizedIOService {
 
 	private final LocalizedMessagesService localizedMessagesService;
