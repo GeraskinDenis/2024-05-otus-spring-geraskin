@@ -3,7 +3,7 @@ package ru.otus.hw.service;
 public interface LocalizedIOService extends LocalizedMessagesService, IOService {
     void printLineLocalized(String code);
 
-    void printFormattedLineLocalized(String code, Object ...args);
+    void printFormattedLineLocalized(String code, Object... args);
 
     String readStringWithPromptLocalized(String promptCode);
 
@@ -12,7 +12,7 @@ public interface LocalizedIOService extends LocalizedMessagesService, IOService 
                                  String invalidInputFormatMessage,
                                  String errorMessageCode);
 
-    int readIntForRangeWithPromptLocalized(int min,int max,
+    int readIntForRangeWithPromptLocalized(int min, int max,
                                            String promptCode,
                                            String invalidInputFormatMessage,
                                            String errorMessageCode);

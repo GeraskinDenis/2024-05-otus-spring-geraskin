@@ -11,22 +11,22 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "test")
 public class AppProperties implements TestConfig, TestFileNameProvider, LocaleConfig {
 
-	@Getter
-	private int rightAnswersCountToPass;
+    @Getter
+    private int rightAnswersCountToPass;
 
-	@Getter
-	private Locale locale;
+    @Getter
+    private Locale locale;
 
-	private Map<String, String> fileNameByLocaleTag;
+    private Map<String, String> fileNameByLocaleTag;
 
-	public void setLocale(String locale) {
-		this.locale = Locale.forLanguageTag(locale);
-	}
+    public void setLocale(String locale) {
+        this.locale = Locale.forLanguageTag(locale);
+    }
 
-	@Override
-	public String getTestFileName() {
-		return fileNameByLocaleTag.get(locale.toLanguageTag());
-	}
+    @Override
+    public String getTestFileName() {
+        return fileNameByLocaleTag.get(locale.toLanguageTag());
+    }
 }
 
 

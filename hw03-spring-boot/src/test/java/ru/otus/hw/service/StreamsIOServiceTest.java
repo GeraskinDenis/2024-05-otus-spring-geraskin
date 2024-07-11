@@ -15,24 +15,24 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class StreamsIOServiceTest {
-	@Mock
-	private PrintStream printStream;
-	@Mock
-	private InputStream inputStream;
-	@InjectMocks
-	private StreamsIOService streamsIOService;
+    @Mock
+    private PrintStream printStream;
+    @Mock
+    private InputStream inputStream;
+    @InjectMocks
+    private StreamsIOService streamsIOService;
 
-	@Test
-	void shouldPrintTheLineCorrectly() {
-		String testLine = "TEST LINE";
-		streamsIOService.printLine(testLine);
-		verify(printStream, times(1)).println(testLine);
-	}
+    @Test
+    void shouldPrintTheLineCorrectly() {
+        String testLine = "TEST LINE";
+        streamsIOService.printLine(testLine);
+        verify(printStream, times(1)).println(testLine);
+    }
 
-	@Test
-	void shouldPrintTheFormattedLineCorrectly() {
-		String fmt = "%s %s %s";
-		streamsIOService.printFormattedLine(fmt, 1, 2, 3);
-		verify(printStream, times(1)).printf(fmt + "%n", 1, 2, 3);
-	}
+    @Test
+    void shouldPrintTheFormattedLineCorrectly() {
+        String fmt = "%s %s %s";
+        streamsIOService.printFormattedLine(fmt, 1, 2, 3);
+        verify(printStream, times(1)).printf(fmt + "%n", 1, 2, 3);
+    }
 }

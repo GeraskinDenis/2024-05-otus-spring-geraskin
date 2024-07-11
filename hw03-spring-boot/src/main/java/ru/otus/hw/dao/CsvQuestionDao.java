@@ -20,41 +20,41 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CsvQuestionDao implements QuestionDao {
 
-	private final TestFileNameProvider fileNameProvider;
+    private final TestFileNameProvider fileNameProvider;
 
-	@Override
-	public List<Question> findAll() {
-		List<Question> questions;
-		InputStream inputStream = getFileAsStream(fileNameProvider.getTestFileName());
-		try (InputStreamReader streamReader = new InputStreamReader(inputStream);
-			 BufferedReader reader = new BufferedReader(streamReader)) {
-			questions = new CsvToBeanBuilder<QuestionDto>(reader)
-					.withType(QuestionDto.class)
-					.withSkipLines(1)
-					.withSeparator(';')
-					.build()
-					.parse()
-					.stream()
-					.map(QuestionDto::toDomainObject)
-					.collect(Collectors.toList());
-		} catch (IOException | RuntimeException e) {
-			throw new QuestionReadException("Error reading questions", e);
-		}
-		if (questions.isEmpty()) {
-			throw new QuestionReadException("Questions not found in the source.");
-		}
+    @Override
+    public List<Question> findAll() {
+        List<Question> questions;
+        InputStream inputStream = getFileAsStream(fileNameProvider.getTestFileName());
+        try (InputStreamReader streamReader = new InputStreamReader(inputStream);
+             BufferedReader reader = new BufferedReader(streamReader)) {
+            questions = new CsvToBeanBuilder<QuestionDto>(reader)
+                    .withType(QuestionDto.class)
+                    .withSkipLines(1)
+                    .withSeparator(';')
+                    .build()
+                    .parse()
+                    .stream()
+                    .map(QuestionDto::toDomainObject)
+                    .collect(Collectors.toList());
+        } catch (IOException | RuntimeException e) {
+            throw new QuestionReadException("Error reading questions", e);
+        }
+        if (questions.isEmpty()) {
+            throw new QuestionReadException("Questions not found in the source.");
+        }
 
-		return questions;
-	}
+        return questions;
+    }
 
-	private InputStream getFileAsStream(String fileName) {
-		ClassLoader classLoader = getClass().getClassLoader();
-		InputStream inputStream = classLoader.getResourceAsStream(fileName);
+    private InputStream getFileAsStream(String fileName) {
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream(fileName);
 
-		if (Objects.isNull(inputStream)) {
-			throw new QuestionReadException("Questions source not found.");
-		}
+        if (Objects.isNull(inputStream)) {
+            throw new QuestionReadException("Questions source not found.");
+        }
 
-		return inputStream;
-	}
+        return inputStream;
+    }
 }

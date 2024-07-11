@@ -14,24 +14,24 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class StudentServiceImplTest {
 
-	@Mock
-	private LocalizedIOService localizedIOService;
+    @Mock
+    private LocalizedIOService localizedIOService;
 
-	@InjectMocks
-	private StudentServiceImpl studentService;
+    @InjectMocks
+    private StudentServiceImpl studentService;
 
-	@BeforeEach
-	public void beforeEach() {
-		when(localizedIOService.readStringWithPromptLocalized("StudentService.input.first.name"))
-				.thenReturn("FirstNameTest");
-		when(localizedIOService.readStringWithPromptLocalized("StudentService.input.last.name"))
-				.thenReturn("LastNameTest");
-	}
+    @BeforeEach
+    public void beforeEach() {
+        when(localizedIOService.readStringWithPromptLocalized("StudentService.input.first.name"))
+                .thenReturn("FirstNameTest");
+        when(localizedIOService.readStringWithPromptLocalized("StudentService.input.last.name"))
+                .thenReturn("LastNameTest");
+    }
 
-	@Test
-	public void shouldDetermineCurrentStudentCorrectly() {
-		Student expectedStudent = new Student("FirstNameTest", "LastNameTest");
-		Student actualStudent = studentService.determineCurrentStudent();
-		assertThat(actualStudent).isNotNull().isEqualTo(expectedStudent);
-	}
+    @Test
+    public void shouldDetermineCurrentStudentCorrectly() {
+        Student expectedStudent = new Student("FirstNameTest", "LastNameTest");
+        Student actualStudent = studentService.determineCurrentStudent();
+        assertThat(actualStudent).isNotNull().isEqualTo(expectedStudent);
+    }
 }

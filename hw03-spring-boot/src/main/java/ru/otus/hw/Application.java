@@ -7,11 +7,11 @@ import ru.otus.hw.service.TestRunnerService;
 
 @SpringBootApplication
 public class Application {
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		//Создать контекст Spring Boot приложения
-		ApplicationContext context = SpringApplication.run(Application.class, args);
-		var testRunnerService = context.getBean(TestRunnerService.class);
-		testRunnerService.run();
-	}
+        //Создать контекст Spring Boot приложения
+        ApplicationContext context = SpringApplication.run(Application.class, args);
+        var testRunnerService = context.getBean(TestRunnerService.class);
+        testRunnerService.run();
+    }
 }
