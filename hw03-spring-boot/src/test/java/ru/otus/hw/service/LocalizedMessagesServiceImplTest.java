@@ -14,9 +14,8 @@ import ru.otus.hw.config.LocaleConfig;
 
 import java.util.Locale;
 
-@SpringBootTest
+@SpringBootTest(classes = LocalizedMessagesServiceImpl.class)
 @ImportAutoConfiguration(MessageSourceAutoConfiguration.class)
-@ContextConfiguration(classes = LocalizedMessagesServiceImpl.class)
 @DisplayName("Should have get message properly")
 public class LocalizedMessagesServiceImplTest {
 
