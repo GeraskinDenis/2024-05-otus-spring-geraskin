@@ -1,34 +1,45 @@
 package ru.otus.hw.service;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.otus.hw.config.TestConfig;
 import ru.otus.hw.domain.TestResult;
 
 @Service
-@RequiredArgsConstructor
 public class ResultServiceImpl implements ResultService {
 
     private final TestConfig testConfig;
 
-    private final LocalizedIOService ioService;
+    private final LocalizedMessagesService messagesService;
+
+    public ResultServiceImpl(TestConfig testConfig,
+                             @Qualifier("localizedMessagesServiceImpl")
+                             LocalizedMessagesService messagesService) {
+        this.testConfig = testConfig;
+        this.messagesService = messagesService;
+    }
 
     @Override
-    public void showResult(TestResult testResult) {
-        ioService.printLine("");
-        ioService.printLineLocalized("ResultService.test.results");
-        ioService.printFormattedLineLocalized("ResultService.student",
-                testResult.getStudent().getFullName());
-        ioService.printFormattedLineLocalized("ResultService.answered.questions.count",
-                testResult.getAnsweredQuestions().size());
-        ioService.printFormattedLineLocalized("ResultService.right.answers.count",
-                testResult.getRightAnswersCount());
-
+    public String getTestResultReport(TestResult testResult) {
+        StringBuilder builder = new StringBuilder("\n")
+                .append(" ")
+                .append(messagesService.getMessage("ResultService.test.results"))
+                .append(" ")
+                .append(messagesService.getMessage("ResultService.student",
+                        testResult.getStudent().getFullName()))
+                .append(" ")
+                .append(messagesService.getMessage("ResultService.answered.questions.count",
+                        testResult.getAnsweredQuestions().size()))
+                .append(" ")
+                .append(messagesService.getMessage("ResultService.right.answers.count",
+                        testResult.getRightAnswersCount()))
+                .append(" ");
         if (testResult.getRightAnswersCount() >= testConfig.getRightAnswersCountToPass()) {
-            ioService.printLineLocalized("ResultService.passed.test");
-            return;
+            builder.append(messagesService.getMessage("ResultService.passed.test"));
+        } else {
+            builder.append(messagesService.getMessage("ResultService.fail.test"));
         }
-        ioService.printLineLocalized("ResultService.fail.test");
+        return builder.toString();
     }
 }
 
