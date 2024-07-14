@@ -31,7 +31,9 @@ public class StudentServiceImplTest {
     @Test
     public void shouldDetermineCurrentStudentCorrectly() {
         Student expectedStudent = new Student("FirstNameTest", "LastNameTest");
-        Student actualStudent = studentService.determineCurrentStudent();
+        Student actualStudent = studentService.determineCurrentStudent(
+                localizedIOService.readStringWithPromptLocalized("StudentService.input.first.name"),
+                localizedIOService.readStringWithPromptLocalized("StudentService.input.last.name"));
         assertThat(actualStudent).isNotNull().isEqualTo(expectedStudent);
     }
 }
