@@ -10,7 +10,7 @@ public class LocalizedIOServiceImpl implements LocalizedIOService {
 
     private final IOService ioService;
 
-    public LocalizedIOServiceImpl(@Qualifier("localizedMessagesServiceImpl")
+    public LocalizedIOServiceImpl(@Qualifier("localizedMessagesService")
                                   LocalizedMessagesService localizedMessagesService,
                                   IOService ioService) {
         this.localizedMessagesService = localizedMessagesService;

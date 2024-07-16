@@ -13,7 +13,7 @@ public class ResultServiceImpl implements ResultService {
     private final LocalizedMessagesService messagesService;
 
     public ResultServiceImpl(TestConfig testConfig,
-                             @Qualifier("localizedMessagesServiceImpl")
+                             @Qualifier("localizedMessagesService")
                              LocalizedMessagesService messagesService) {
         this.testConfig = testConfig;
         this.messagesService = messagesService;
