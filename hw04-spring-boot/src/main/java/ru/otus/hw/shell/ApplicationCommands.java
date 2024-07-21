@@ -9,6 +9,7 @@ import org.springframework.shell.standard.ShellOption;
 import ru.otus.hw.domain.Student;
 import ru.otus.hw.domain.TestResult;
 import ru.otus.hw.domain.TestSession;
+import ru.otus.hw.security.LoginContext;
 import ru.otus.hw.service.LocalizedMessagesService;
 import ru.otus.hw.service.ResultService;
 import ru.otus.hw.service.StudentService;
@@ -17,7 +18,7 @@ import ru.otus.hw.service.TestService;
 import java.util.Objects;
 
 @ShellComponent(value = "Application commands")
-public class ApplicationEventsCommands {
+public class ApplicationCommands {
 
     private final LocalizedMessagesService messagesService;
 
@@ -27,16 +28,20 @@ public class ApplicationEventsCommands {
 
     private final ResultService resultService;
 
+    private final LoginContext loginContext;
+
     private TestSession testSession;
 
-    public ApplicationEventsCommands(@Qualifier("localizedMessagesService") LocalizedMessagesService messagesService,
-                                     TestService testService,
-                                     StudentService studentService,
-                                     ResultService resultService) {
+    public ApplicationCommands(@Qualifier("localizedMessagesService") LocalizedMessagesService messagesService,
+                               TestService testService,
+                               StudentService studentService,
+                               ResultService resultService,
+                               LoginContext loginContext) {
         this.messagesService = messagesService;
         this.testService = testService;
         this.studentService = studentService;
         this.resultService = resultService;
+        this.loginContext = loginContext;
     }
 
     @ShellMethod(value = "Login", key = {"l", "login"})
@@ -45,7 +50,7 @@ public class ApplicationEventsCommands {
                         @ShellOption(help = "Last name") String lastName) {
 
         Student student = studentService.determineCurrentStudent(firstName, lastName);
-        testSession = new TestSession(student);
+        loginContext.login(student);
         return String.format(messagesService.getMessage("ApplicationEventsCommands.welcome.student")
                 , student.getFullName());
     }
@@ -53,7 +58,7 @@ public class ApplicationEventsCommands {
     @ShellMethod(value = "Logout", key = {"out", "logout"})
     @ShellMethodAvailability("isUserLoggedIn")
     public String logout() {
-        testSession = null;
+        loginContext.logout();
         return String.format(messagesService.getMessage("ApplicationEventsCommands.see.you.soon"));
     }
 
@@ -77,13 +82,13 @@ public class ApplicationEventsCommands {
     }
 
     public Availability isUserLoggedIn() {
-        return Objects.nonNull(testSession)
+        return loginContext.isUserLoggedIn()
                 ? Availability.available()
                 : Availability.unavailable(messagesService.getMessage("ApplicationEventsCommands.you.are.not.logged"));
     }
 
     public Availability isNotUserLoggedIn() {
-        return Objects.isNull(testSession)
+        return !loginContext.isUserLoggedIn()
                 ? Availability.available()
                 : Availability.unavailable(messagesService.getMessage("ApplicationEventsCommands.already.logged.in"));
     }
