@@ -11,7 +11,7 @@ public interface BookService {
 
     List<Book> findAll();
 
-    Book insert(String title, long authorId, Set<Long> genresIds);
+    Book insert(String title, long authorId, Set<Long> genreIds);
 
     Book update(long id, String title, long authorId, Set<Long> genresIds);
 
