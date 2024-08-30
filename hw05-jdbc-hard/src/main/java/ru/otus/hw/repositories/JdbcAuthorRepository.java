@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -76,7 +77,8 @@ public class JdbcAuthorRepository implements AuthorRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource paramMap = new MapSqlParameterSource("full_name", author.getFullName());
         jdbcOperations.update(sql, paramMap, keyHolder, new String[]{"id"});
-        author.setId(keyHolder.getKeyAs(Long.class));
+        Long id = Objects.requireNonNull(keyHolder.getKeyAs(Long.class), "The author is not saved in the DB.");
+        author.setId(id);
         return author;
     }
 

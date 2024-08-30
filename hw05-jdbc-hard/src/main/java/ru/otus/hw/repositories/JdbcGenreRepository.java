@@ -75,7 +75,7 @@ public class JdbcGenreRepository implements GenreRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource paramMap = new MapSqlParameterSource("name", genre.getName());
         jdbcOperations.update(sql, paramMap, keyHolder, new String[]{"id"});
-        Long id = Objects.requireNonNull(keyHolder.getKeyAs(Long.class));
+        Long id = Objects.requireNonNull(keyHolder.getKeyAs(Long.class), "The genre is not saved in the DB.");
         genre.setId(id);
         return genre;
     }

@@ -108,7 +108,7 @@ public class JdbcBookRepository implements BookRepository {
                 .addValue("title", book.getTitle())
                 .addValue("author_id", book.getAuthor().getId());
         jdbcOperations.update(sql, paramMap, keyHolder, new String[]{"id"});
-        Long id = Optional.ofNullable(keyHolder.getKeyAs(Long.class)).orElseThrow();
+        Long id = Objects.requireNonNull(keyHolder.getKeyAs(Long.class), "The book is not saved in the DB.");
         book.setId(id);
         batchInsertGenresRelationsFor(book);
         return book;

@@ -8,9 +8,8 @@ import ru.otus.hw.converters.BookConverter;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.services.BookService;
 
-import java.util.*;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @SuppressWarnings({"SpellCheckingInspection", "unused"})
 @RequiredArgsConstructor
@@ -38,7 +37,17 @@ public class BookCommands {
     @ShellMethod(value = "Insert a new book", key = "bi")
     public String insertBook(@ShellOption(value = "title", help = "title of new book") String title,
                              @ShellOption(value = "authorId", help = "author ID") long authorId,
-                             @ShellOption(value = "genereIds", help = "list of genre ids (example: \"1,2,3\")") Set<Long> genreIds) {
+                             @ShellOption(value = "genereIds", help = "list of genre ids (example: \"1,2,3\")")
+                                 Set<Long> genreIds) {
+        Book savedBook = bookService.insert(title, authorId, genreIds);
+        return bookConverter.bookToString(savedBook);
+    }
+
+    @ShellMethod(value = "Insert a new book (test)", key = "bit")
+    public String insertBook() {
+        String title = "Test title";
+        long authorId = 2L;
+        Set<Long> genreIds = Set.of(1L, 2L, 5L);
         Book savedBook = bookService.insert(title, authorId, genreIds);
         return bookConverter.bookToString(savedBook);
     }
@@ -47,7 +56,8 @@ public class BookCommands {
     public String updateBook(@ShellOption(value = "id", help = "book id") long id,
                              @ShellOption(value = "title", help = "title of new book") String title,
                              @ShellOption(value = "authorId", help = "author ID") long authorId,
-                             @ShellOption(value = "genereIds", help = "list of genre ids (example: \"1,2,3\")") Set<Long> genreIds) {
+                             @ShellOption(value = "genereIds", help = "list of genre ids (example: \"1,2,3\")")
+                                 Set<Long> genreIds) {
         var savedBook = bookService.update(id, title, authorId, genreIds);
         return bookConverter.bookToString(savedBook);
     }
