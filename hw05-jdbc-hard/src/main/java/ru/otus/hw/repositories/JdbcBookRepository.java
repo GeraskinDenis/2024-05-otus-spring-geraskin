@@ -11,6 +11,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.exceptions.JdbcDataIntegrityViolationException;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
@@ -108,7 +109,8 @@ public class JdbcBookRepository implements BookRepository {
                 .addValue("title", book.getTitle())
                 .addValue("author_id", book.getAuthor().getId());
         jdbcOperations.update(sql, paramMap, keyHolder, new String[]{"id"});
-        Long id = Objects.requireNonNull(keyHolder.getKeyAs(Long.class), "The book is not saved in the DB.");
+        Long id = Optional.ofNullable(keyHolder.getKeyAs(Long.class))
+                .orElseThrow(() -> new JdbcDataIntegrityViolationException("The book is not saved in the DB."));
         book.setId(id);
         batchInsertGenresRelationsFor(book);
         return book;
@@ -150,11 +152,15 @@ public class JdbcBookRepository implements BookRepository {
     @RequiredArgsConstructor
     private static class BookResultSetExtractor implements ResultSetExtractor<List<Book>> {
 
+        private final Map<Long, Book> books = new HashMap<>();
+
+        private final Map<Long, Author> authors = new HashMap<>();
+
+        private final Map<Long, Genre> genres = new HashMap<>();
+
         @Override
         public List<Book> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            Map<Long, Book> books = new HashMap<>();
-            Map<Long, Author> authors = new HashMap<>();
-            Map<Long, Genre> genres = new HashMap<>();
+
             while (rs.next()) {
                 Long bookId = rs.getLong("book_id");
                 Long genreId = rs.getLong("genre_id");
@@ -172,7 +178,6 @@ public class JdbcBookRepository implements BookRepository {
                 Book book = books.get(bookId);
                 if (Objects.isNull(book)) {
                     book = new Book(bookId, rs.getString("book_title"), author, new ArrayList<>());
-                    book.setGenres(new ArrayList<>());
                     books.put(bookId, book);
                 }
                 book.getGenres().add(genre);

@@ -9,13 +9,13 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.otus.hw.exceptions.JdbcDataIntegrityViolationException;
 import ru.otus.hw.models.Genre;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -75,7 +75,8 @@ public class JdbcGenreRepository implements GenreRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource paramMap = new MapSqlParameterSource("name", genre.getName());
         jdbcOperations.update(sql, paramMap, keyHolder, new String[]{"id"});
-        Long id = Objects.requireNonNull(keyHolder.getKeyAs(Long.class), "The genre is not saved in the DB.");
+        Long id = Optional.ofNullable(keyHolder.getKeyAs(Long.class))
+                .orElseThrow(() -> new JdbcDataIntegrityViolationException("The genre is not saved in the DB."));
         genre.setId(id);
         return genre;
     }

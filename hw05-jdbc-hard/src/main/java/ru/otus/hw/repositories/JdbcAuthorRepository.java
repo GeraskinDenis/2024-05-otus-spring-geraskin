@@ -9,13 +9,13 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.otus.hw.exceptions.JdbcDataIntegrityViolationException;
 import ru.otus.hw.models.Author;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -77,7 +77,8 @@ public class JdbcAuthorRepository implements AuthorRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource paramMap = new MapSqlParameterSource("full_name", author.getFullName());
         jdbcOperations.update(sql, paramMap, keyHolder, new String[]{"id"});
-        Long id = Objects.requireNonNull(keyHolder.getKeyAs(Long.class), "The author is not saved in the DB.");
+        Long id = Optional.ofNullable(keyHolder.getKeyAs(Long.class))
+                .orElseThrow(() -> new JdbcDataIntegrityViolationException("The author is not saved in the DB."));
         author.setId(id);
         return author;
     }
