@@ -2,7 +2,6 @@ package ru.otus.hw.repositories;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -11,8 +10,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.otus.hw.models.Genre;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -25,10 +22,12 @@ public class JdbcGenreRepository implements GenreRepository {
 
     private final NamedParameterJdbcOperations jdbcOperations;
 
+    private final GenreRowMapper genreRowMapper;
+
     @Override
     public List<Genre> findAll() {
         String sql = "SELECT id, name FROM genres ";
-        return jdbcOperations.query(sql, new GenreRowMapper());
+        return jdbcOperations.query(sql, genreRowMapper);
     }
 
     @Override
@@ -36,10 +35,11 @@ public class JdbcGenreRepository implements GenreRepository {
         String sql = "SELECT id, name FROM genres WHERE id = :id ";
         try {
             return Optional.ofNullable(
-                    jdbcOperations.queryForObject(sql,
+                    jdbcOperations.queryForObject(
+                            sql,
                             Collections.singletonMap("id", id),
-                            new GenreRowMapper())
-            );
+                            genreRowMapper
+                    ));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
@@ -48,7 +48,7 @@ public class JdbcGenreRepository implements GenreRepository {
     @Override
     public List<Genre> findByIds(Set<Long> ids) {
         String sql = "SELECT id, name FROM genres WHERE id IN (:id)";
-        return jdbcOperations.query(sql, Collections.singletonMap("id", ids), new GenreRowMapper());
+        return jdbcOperations.query(sql, Collections.singletonMap("id", ids), genreRowMapper);
     }
 
     @Override
@@ -86,14 +86,5 @@ public class JdbcGenreRepository implements GenreRepository {
                 .addValue("id", genre.getId());
         jdbcOperations.update(sql, paramMap);
         return genre;
-    }
-
-    private static class GenreRowMapper implements RowMapper<Genre> {
-        @Override
-        public Genre mapRow(ResultSet rs, int i) throws SQLException {
-            long id = rs.getLong("id");
-            String name = rs.getString("name");
-            return new Genre(id, name);
-        }
     }
 }

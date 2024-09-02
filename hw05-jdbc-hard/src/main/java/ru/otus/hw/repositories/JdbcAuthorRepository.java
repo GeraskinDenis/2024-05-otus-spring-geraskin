@@ -2,7 +2,6 @@ package ru.otus.hw.repositories;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -11,8 +10,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.otus.hw.models.Author;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +21,8 @@ public class JdbcAuthorRepository implements AuthorRepository {
 
     private final NamedParameterJdbcOperations jdbcOperations;
 
+    private final AuthorRowMapper authorRowMapper;
+
     @Override
     public List<Author> findAll() {
         String sql = """
@@ -32,7 +31,7 @@ public class JdbcAuthorRepository implements AuthorRepository {
                     full_name
                 FROM authors
                 """;
-        return jdbcOperations.query(sql, new AuthorRowMapper());
+        return jdbcOperations.query(sql, authorRowMapper);
     }
 
     @Override
@@ -45,9 +44,10 @@ public class JdbcAuthorRepository implements AuthorRepository {
                 WHERE id = :id
                 """;
         try {
-            return Optional.ofNullable(jdbcOperations.queryForObject(sql,
+            return Optional.ofNullable(jdbcOperations.queryForObject(
+                    sql,
                     Collections.singletonMap("id", id),
-                    new AuthorRowMapper()));
+                    authorRowMapper));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
@@ -88,15 +88,5 @@ public class JdbcAuthorRepository implements AuthorRepository {
                 .addValue("id", author.getId());
         jdbcOperations.update(sql, paramMap);
         return author;
-    }
-
-    private static class AuthorRowMapper implements RowMapper<Author> {
-
-        @Override
-        public Author mapRow(ResultSet rs, int i) throws SQLException {
-            long id = rs.getLong("id");
-            String fullName = rs.getString("full_name");
-            return new Author(id, fullName);
-        }
     }
 }
