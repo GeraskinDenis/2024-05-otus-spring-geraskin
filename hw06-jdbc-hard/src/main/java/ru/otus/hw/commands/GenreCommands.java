@@ -45,6 +45,6 @@ public class GenreCommands {
     @ShellMethod(value = "Delete a genre by id", key = "gd")
     public String delete(@ShellOption(value = "id", help = "id of the genre to delete") long id) {
         genreService.deleteById(id);
-        return "Delete complate!";
+        return "Delete complete!";
     }
 }

@@ -43,7 +43,7 @@ public class AuthorCommands {
     }
 
     @ShellMethod(value = "Delete author by ID", key = "ad")
-    public String delete(@ShellOption(value = {"id"}, help = "author ID to delete") long id) {
+    public String delete(@ShellOption(value = "id", help = "author ID to delete") long id) {
         authorService.deleteById(id);
         return "Delete complete!";
     }

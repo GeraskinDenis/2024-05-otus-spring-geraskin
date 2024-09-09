@@ -18,6 +18,7 @@
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <spring.boot.data.jpa.version>3.3.0</spring.boot.data.jpa.version>
         <spring.shell.version>3.2.4</spring.shell.version>
         <liquibase.version>4.29.0</liquibase.version>
         <checkstyle-plugin.version>3.3.1</checkstyle-plugin.version>
@@ -29,8 +30,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jdbc</artifactId>
+            <groupId>org.Springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring.boot.data.jpa.version}</version>
         </dependency>
 
         <dependency>

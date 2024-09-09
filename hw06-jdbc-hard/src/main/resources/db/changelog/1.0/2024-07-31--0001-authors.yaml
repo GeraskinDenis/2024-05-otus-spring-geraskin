@@ -15,3 +15,5 @@ databaseChangeLog:
           - column:
               name: full_name
               type: varchar(255)
+              constraints:
+                nullable: false
