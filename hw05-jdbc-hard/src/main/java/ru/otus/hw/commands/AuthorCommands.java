@@ -5,10 +5,12 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import ru.otus.hw.converters.AuthorConverter;
+import ru.otus.hw.exceptions.EntityNotSavedException;
 import ru.otus.hw.services.AuthorService;
 
 import java.util.stream.Collectors;
 
+@SuppressWarnings({"SpellCheckingInspection", "unused"})
 @ShellComponent
 @RequiredArgsConstructor
 public class AuthorCommands {
@@ -33,7 +35,12 @@ public class AuthorCommands {
 
     @ShellMethod(value = "Insert a new author", key = "ai")
     public String insert(@ShellOption(value = "full_name", help = "full name of the new author") String fullName) {
-        return authorConverter.authorToString(authorService.insert(fullName));
+        try {
+            return authorConverter.authorToString(authorService.insert(fullName));
+        } catch (EntityNotSavedException ex) {
+            return "В процессе сохранения Автора (%s) произошла ошибка: %s"
+                    .formatted(fullName, ex.getMessage());
+        }
     }
 
     @ShellMethod(value = "Update existing author", key = "au")

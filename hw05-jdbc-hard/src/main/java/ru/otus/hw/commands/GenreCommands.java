@@ -5,12 +5,14 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import ru.otus.hw.converters.GenreConverter;
+import ru.otus.hw.exceptions.EntityNotSavedException;
 import ru.otus.hw.services.GenreService;
 
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
+@SuppressWarnings({"SpellCheckingInspection", "unused"})
 @ShellComponent
+@RequiredArgsConstructor
 public class GenreCommands {
 
     private final GenreService genreService;
@@ -33,7 +35,12 @@ public class GenreCommands {
 
     @ShellMethod(value = "Insert a new genre", key = "gi")
     public String insert(@ShellOption(value = "name", help = "name of the new genre") String name) {
-        return genreConverter.genreToString(genreService.insert(name));
+        try {
+            return genreConverter.genreToString(genreService.insert(name));
+        } catch (EntityNotSavedException ex) {
+            return "В процессе сохранения Жанра (%s) произошла ошибка: %s"
+                    .formatted(name, ex.getMessage());
+        }
     }
 
     @ShellMethod(value = "Update a genre", key = "gu")
