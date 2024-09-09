@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.otus.hw.exceptions.EntityNotSavedException;
 import ru.otus.hw.models.Author;
 
 import java.util.Collections;
@@ -21,25 +22,23 @@ public class JdbcAuthorRepository implements AuthorRepository {
 
     private final NamedParameterJdbcOperations jdbcOperations;
 
-    private final AuthorRowMapper authorRowMapper;
-
     @Override
     public List<Author> findAll() {
         String sql = """
                 SELECT
-                    id,
-                    full_name
+                    id AS author_id,
+                    full_name AS author_full_name
                 FROM authors
                 """;
-        return jdbcOperations.query(sql, authorRowMapper);
+        return jdbcOperations.query(sql, new AuthorRowMapper());
     }
 
     @Override
     public Optional<Author> findById(long id) {
         String sql = """
                 SELECT
-                    id,
-                    full_name
+                    id AS author_id,
+                    full_name AS author_full_name
                 FROM authors
                 WHERE id = :id
                 """;
@@ -47,7 +46,7 @@ public class JdbcAuthorRepository implements AuthorRepository {
             return Optional.ofNullable(jdbcOperations.queryForObject(
                     sql,
                     Collections.singletonMap("id", id),
-                    authorRowMapper));
+                    new AuthorRowMapper()));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
@@ -77,7 +76,8 @@ public class JdbcAuthorRepository implements AuthorRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource paramMap = new MapSqlParameterSource("full_name", author.getFullName());
         jdbcOperations.update(sql, paramMap, keyHolder, new String[]{"id"});
-        Long id = Objects.requireNonNull(keyHolder.getKeyAs(Long.class), "The author is not saved in the DB.");
+        Long id = Optional.ofNullable(keyHolder.getKeyAs(Long.class))
+                .orElseThrow(() -> new EntityNotSavedException("Can not determine saved Author id"));
         author.setId(id);
         return author;
     }

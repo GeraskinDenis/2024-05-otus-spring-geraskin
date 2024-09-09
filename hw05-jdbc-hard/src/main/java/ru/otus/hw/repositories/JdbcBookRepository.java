@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.exceptions.EntityNotSavedException;
 import ru.otus.hw.models.Book;
 
 import java.sql.ResultSet;
@@ -25,8 +26,6 @@ public class JdbcBookRepository implements BookRepository {
 
     private final NamedParameterJdbcOperations jdbcOperations;
 
-    private final BookResultSetExtractor bookResultSetExtractor;
-
     @Override
     public Optional<Book> findById(long id) {
         String sql = """
@@ -39,13 +38,13 @@ public class JdbcBookRepository implements BookRepository {
                     genre.name AS genre_name
                 FROM
                     books AS book
-                    INNER JOIN authors AS author ON book.author_id = author.id
-                    INNER JOIN books_genres AS books_genres ON book.id = books_genres.book_id
-                    INNER JOIN genres AS genre ON books_genres.genre_id = genre.id
+                    LEFT JOIN authors AS author ON book.author_id = author.id
+                    LEFT JOIN books_genres AS books_genres ON book.id = books_genres.book_id
+                    LEFT JOIN genres AS genre ON books_genres.genre_id = genre.id
                 WHERE
                     book.id = :id
                 """;
-        List<Book> books = jdbcOperations.query(sql, Collections.singletonMap("id", id), bookResultSetExtractor);
+        List<Book> books = jdbcOperations.query(sql, Collections.singletonMap("id", id), new BookResultSetExtractor());
         if (Objects.isNull(books) || books.isEmpty()) {
             return Optional.empty();
         }
@@ -68,7 +67,7 @@ public class JdbcBookRepository implements BookRepository {
                     INNER JOIN books_genres AS books_genres ON book.id = books_genres.book_id
                     INNER JOIN genres AS genre ON books_genres.genre_id = genre.id
                 """;
-        return jdbcOperations.query(sql, bookResultSetExtractor);
+        return jdbcOperations.query(sql, new BookResultSetExtractor());
     }
 
     @Override
@@ -102,7 +101,8 @@ public class JdbcBookRepository implements BookRepository {
                 .addValue("title", book.getTitle())
                 .addValue("author_id", book.getAuthor().getId());
         jdbcOperations.update(sql, paramMap, keyHolder, new String[]{"id"});
-        Long id = Objects.requireNonNull(keyHolder.getKeyAs(Long.class), "The book is not saved in the DB.");
+        Long id = Optional.ofNullable(keyHolder.getKeyAs(Long.class))
+                .orElseThrow(() -> new EntityNotSavedException("Can not determine saved Book id"));
         book.setId(id);
         batchInsertGenresRelationsFor(book);
         return book;
