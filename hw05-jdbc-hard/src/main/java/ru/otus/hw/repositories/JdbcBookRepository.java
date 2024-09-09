@@ -11,7 +11,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.otus.hw.exceptions.EntityNotFoundException;
-import ru.otus.hw.exceptions.JdbcDataIntegrityViolationException;
+import ru.otus.hw.exceptions.EntityNotSavedException;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
@@ -110,7 +110,7 @@ public class JdbcBookRepository implements BookRepository {
                 .addValue("author_id", book.getAuthor().getId());
         jdbcOperations.update(sql, paramMap, keyHolder, new String[]{"id"});
         Long id = Optional.ofNullable(keyHolder.getKeyAs(Long.class))
-                .orElseThrow(() -> new JdbcDataIntegrityViolationException("The book is not saved in the DB."));
+                .orElseThrow(() -> new EntityNotSavedException("Can not determine saved Book id"));
         book.setId(id);
         batchInsertGenresRelationsFor(book);
         return book;

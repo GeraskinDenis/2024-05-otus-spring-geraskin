@@ -5,6 +5,7 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import ru.otus.hw.converters.BookConverter;
+import ru.otus.hw.exceptions.EntityNotSavedException;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.services.BookService;
 
@@ -39,17 +40,13 @@ public class BookCommands {
                              @ShellOption(value = "authorId", help = "author ID") long authorId,
                              @ShellOption(value = "genereIds", help = "list of genre ids (example: \"1,2,3\")")
                                  Set<Long> genreIds) {
-        Book savedBook = bookService.insert(title, authorId, genreIds);
-        return bookConverter.bookToString(savedBook);
-    }
-
-    @ShellMethod(value = "Insert a new book (test)", key = "bit")
-    public String insertBook() {
-        String title = "Test title";
-        long authorId = 2L;
-        Set<Long> genreIds = Set.of(1L, 2L, 5L);
-        Book savedBook = bookService.insert(title, authorId, genreIds);
-        return bookConverter.bookToString(savedBook);
+        try {
+            Book savedBook = bookService.insert(title, authorId, genreIds);
+            return bookConverter.bookToString(savedBook);
+        } catch (EntityNotSavedException ex) {
+            return "В процессе сохранения Книги (%s) произошла ошибка: %s"
+                    .formatted(title, ex.getMessage());
+        }
     }
 
     @ShellMethod(value = "Update book", key = "bu")
