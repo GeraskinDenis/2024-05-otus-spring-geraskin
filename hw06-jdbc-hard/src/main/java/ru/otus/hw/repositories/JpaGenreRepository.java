@@ -32,8 +32,10 @@ public class JpaGenreRepository implements GenreRepository {
 
     @Override
     public List<Genre> findByIds(Set<Long> ids) {
-        String jpql = "SELECT e FROM Genre e WHERE e.id IN (ids)";
-        return em.createQuery(jpql, Genre.class).getResultList();
+        String jpql = "SELECT e FROM Genre e WHERE e.id IN (:ids)";
+        return em.createQuery(jpql, Genre.class)
+                .setParameter("ids", ids)
+                .getResultList();
     }
 
     @Override
