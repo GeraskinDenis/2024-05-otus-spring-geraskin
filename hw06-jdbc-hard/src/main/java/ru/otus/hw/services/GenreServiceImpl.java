@@ -12,6 +12,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class GenreServiceImpl implements GenreService {
+
     private final GenreRepository genreRepository;
 
     @Transactional(readOnly = true)

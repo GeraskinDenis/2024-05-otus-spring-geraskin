@@ -9,10 +9,9 @@ import ru.otus.hw.services.GenreService;
 
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @ShellComponent
+@RequiredArgsConstructor
 public class GenreCommands {
-
     private final GenreService genreService;
 
     private final GenreConverter genreConverter;

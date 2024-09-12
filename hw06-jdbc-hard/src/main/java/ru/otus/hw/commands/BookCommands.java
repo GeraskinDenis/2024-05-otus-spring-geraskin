@@ -5,15 +5,13 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import ru.otus.hw.converters.BookConverter;
-import ru.otus.hw.models.Book;
 import ru.otus.hw.services.BookService;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@SuppressWarnings({"SpellCheckingInspection", "unused"})
-@RequiredArgsConstructor
 @ShellComponent
+@RequiredArgsConstructor
 public class BookCommands {
 
     private final BookService bookService;
@@ -38,7 +36,7 @@ public class BookCommands {
     public String insertBook(@ShellOption(value = "title", help = "title of new book") String title,
                              @ShellOption(value = "authorId", help = "author ID") long authorId,
                              @ShellOption(value = "genereIds", help = "list of genre ids (example: \"1,2,3\")")
-                                 Set<Long> genreIds) {
+                             Set<Long> genreIds) {
         return bookConverter.bookToString(bookService.insert(title, authorId, genreIds));
     }
 
@@ -47,7 +45,7 @@ public class BookCommands {
                              @ShellOption(value = "title", help = "title of new book") String title,
                              @ShellOption(value = "authorId", help = "author ID") long authorId,
                              @ShellOption(value = "genereIds", help = "list of genre ids (example: \"1,2,3\")")
-                                 Set<Long> genreIds) {
+                             Set<Long> genreIds) {
         var savedBook = bookService.update(id, title, authorId, genreIds);
         return bookConverter.bookToString(savedBook);
     }

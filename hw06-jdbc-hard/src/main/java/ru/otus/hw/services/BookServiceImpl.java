@@ -11,7 +11,6 @@ import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.GenreRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -22,6 +21,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
+
     private final AuthorRepository authorRepository;
 
     private final GenreRepository genreRepository;
@@ -33,26 +33,26 @@ public class BookServiceImpl implements BookService {
     @Transactional(readOnly = true)
     @Override
     public Optional<BookDto> findById(long id) {
-        return bookRepository.findById(id).map(bookMapper::toBookDto);
+        return bookRepository.findById(id).map(bookMapper::toDto);
     }
 
     @Transactional(readOnly = true)
     @Override
     public List<BookDto> findAll() {
         return bookRepository.findAll().stream()
-                .map(bookMapper::toBookDto).collect(Collectors.toList());
+                .map(bookMapper::toDto).collect(Collectors.toList());
     }
 
     @Transactional
     @Override
     public BookDto insert(String title, long authorId, Set<Long> genreIds) {
-        return bookMapper.toBookDto(save(0, title, authorId, genreIds));
+        return bookMapper.toDto(save(0, title, authorId, genreIds));
     }
 
     @Transactional
     @Override
     public BookDto update(long id, String title, long authorId, Set<Long> genresIds) {
-        return bookMapper.toBookDto(save(id, title, authorId, genresIds));
+        return bookMapper.toDto(save(id, title, authorId, genresIds));
     }
 
     @Transactional

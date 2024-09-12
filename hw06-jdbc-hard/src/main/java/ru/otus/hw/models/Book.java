@@ -6,13 +6,13 @@ import lombok.*;
 import java.util.List;
 import java.util.Objects;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "books")
 @NamedEntityGraph(name = "books-author-entity-graph",
         attributeNodes = {@NamedAttributeNode("author")})
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Book {
 
     @Id
@@ -33,3 +33,4 @@ public class Book {
     @ToString.Exclude
     private List<Genre> genres;
 }
+

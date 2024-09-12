@@ -3,6 +3,7 @@ package ru.otus.hw.repositories;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.otus.hw.models.Book;
 
@@ -12,14 +13,11 @@ import java.util.Optional;
 import static org.springframework.data.jpa.repository.EntityGraph.EntityGraphType.FETCH;
 
 @Repository
+@RequiredArgsConstructor
 public class JpaBookRepository implements BookRepository {
 
     @PersistenceContext
     private final EntityManager em;
-
-    public JpaBookRepository(EntityManager em) {
-        this.em = em;
-    }
 
     @Override
     public Optional<Book> findById(long id) {
