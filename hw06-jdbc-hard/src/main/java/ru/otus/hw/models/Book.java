@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "books")
@@ -14,6 +13,13 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Book {
+
+    public Book(long id, String title, Author author, List<Genre> genres) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.genres = genres;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,5 +38,11 @@ public class Book {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private List<Genre> genres;
+
+    @OneToMany(targetEntity = BookComment.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "book_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private List<BookComment> comments;
 }
 

@@ -11,6 +11,7 @@ import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.GenreRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -73,7 +74,7 @@ public class BookServiceImpl implements BookService {
             throw new EntityNotFoundException("One or all genres with ids %s not found".formatted(genresIds));
         }
 
-        var book = new Book(id, title, author, genres);
+        var book = new Book(id, title, author, genres, new ArrayList<>());
         return bookRepository.save(book);
     }
 }
