@@ -18,12 +18,17 @@ public class JpaBookCommentsRepository implements BookCommentsRepository {
 
     @Override
     public Optional<BookComment> findById(long id) {
-        return Optional.of(em.find(BookComment.class, id));
+        return Optional
+                .ofNullable(em.find(BookComment.class, id))
+                .or(Optional::empty);
     }
 
     @Override
     public List<BookComment> findAllByBookId(long bookId) {
-        return List.of();
+        String jpql = "SELECT bc FROM BookComment bc WHERE bc.book = :book";
+        return em.createQuery(jpql, BookComment.class)
+                .setParameter("book", bookId)
+                .getResultList();
     }
 
     @Override

@@ -10,7 +10,6 @@ import java.util.List;
 @NamedEntityGraph(name = "books-author-entity-graph",
         attributeNodes = {@NamedAttributeNode("author")})
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class Book {
 

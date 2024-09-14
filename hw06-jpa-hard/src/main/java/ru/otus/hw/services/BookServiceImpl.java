@@ -74,7 +74,7 @@ public class BookServiceImpl implements BookService {
             throw new EntityNotFoundException("One or all genres with ids %s not found".formatted(genresIds));
         }
 
-        var book = new Book(id, title, author, genres, new ArrayList<>());
+        var book = new Book(id, title, author, genres);
         return bookRepository.save(book);
     }
 }
