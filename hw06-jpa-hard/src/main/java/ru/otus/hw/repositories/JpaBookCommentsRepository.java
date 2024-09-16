@@ -18,31 +18,33 @@ public class JpaBookCommentsRepository implements BookCommentsRepository {
 
     @Override
     public Optional<BookComment> findById(long id) {
-        return Optional
-                .ofNullable(em.find(BookComment.class, id))
-                .or(Optional::empty);
+        return Optional.ofNullable(em.find(BookComment.class, id));
     }
 
     @Override
     public List<BookComment> findAllByBookId(long bookId) {
-        String jpql = "SELECT bc FROM BookComment bc WHERE bc.book = :book";
+        String jpql = "SELECT bc FROM BookComment bc WHERE bc.book.id = :bookId";
         return em.createQuery(jpql, BookComment.class)
-                .setParameter("book", bookId)
+                .setParameter("bookId", bookId)
                 .getResultList();
     }
 
     @Override
     public BookComment save(BookComment bookComment) {
-        return null;
+        if (bookComment.getId() == 0) {
+            em.persist(bookComment);
+            return bookComment;
+        }
+        return em.merge(bookComment);
     }
 
     @Override
     public void deleteById(long id) {
-
+        findById(id).ifPresent(em::remove);
     }
 
     @Override
     public void deleteAllByBookId(long bookId) {
-
+        findAllByBookId(bookId).forEach(em::remove);
     }
 }

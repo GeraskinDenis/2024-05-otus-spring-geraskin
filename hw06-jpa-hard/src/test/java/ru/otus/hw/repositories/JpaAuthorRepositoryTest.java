@@ -1,5 +1,6 @@
 package ru.otus.hw.repositories;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,13 +18,16 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Репозиторий на основе Jdbc для работы с 'Авторами'")
+@DisplayName("Репозиторий на основе JPA для работы с 'Авторами'")
 @DataJpaTest
 @Import(JpaAuthorRepository.class)
 public class JpaAuthorRepositoryTest {
 
     @Autowired
-    private JpaAuthorRepository authorRepository;
+    private JpaAuthorRepository repository;
+
+    @Autowired
+    private EntityManager em;
 
     private List<Author> dbAuthors;
 
@@ -35,7 +39,7 @@ public class JpaAuthorRepositoryTest {
     @DisplayName("should return the correct list of Authors")
     @Test
     void findAllTest() {
-        List<Author> actual = authorRepository.findAll();
+        List<Author> actual = repository.findAll();
         List<Author> expected = dbAuthors;
         assertThat(actual).containsExactlyElementsOf(expected);
         actual.forEach(System.out::println);
@@ -45,53 +49,59 @@ public class JpaAuthorRepositoryTest {
     @ParameterizedTest
     @MethodSource("getDbAuthors")
     void findByIdTestCase1(Author expected) {
-        Optional<Author> actual = authorRepository.findById(expected.getId());
+        Optional<Author> actual = repository.findById(expected.getId());
         assertThat(actual).isPresent().get().isEqualTo(expected);
     }
 
     @DisplayName("should not find the author by 'id'")
     @Test
     void findByIdTestCase2() {
-        Optional<Author> actual = authorRepository.findById(10L);
+        Optional<Author> actual = repository.findById(10L);
         assertThat(actual).isEmpty();
     }
 
     @DisplayName("should save a new Author correctly")
     @Test
     void insertTest() {
-        Author expected = authorRepository.save(new Author(0, "TestAuthor"));
+        Author expected = repository.save(new Author(0, "TestAuthor"));
         assertThat(expected).isNotNull()
                 .matches(e -> e.getId() > 0)
                 .matches(e -> Objects.nonNull(e.getFullName()))
                 .matches(e -> !e.getFullName().isEmpty());
-        Optional<Author> actual = authorRepository.findById(expected.getId());
-        assertThat(actual).isPresent().get()
+        Author actual = em.find(Author.class, expected.getId());
+        assertThat(actual)
+                .isNotNull()
                 .isEqualTo(expected);
     }
 
     @DisplayName("should delete Author by 'id'")
-    @Test
-    void deleteByIdTest() {
-        assertThat(authorRepository.findById(1L)).isPresent();
-        authorRepository.deleteById(1L);
-        assertThat(authorRepository.findById(1L)).isEmpty();
+    @ParameterizedTest
+    @MethodSource("getDbAuthors")
+    void deleteByIdTest(Author author) {
+        assertThat(em.find(Author.class, author.getId()))
+                .isNotNull().isEqualTo(author);
+        repository.deleteById(author.getId());
+        assertThat(em.find(Author.class, author.getId()))
+                .isNull();
 
     }
 
     @DisplayName("should update Author correctly")
-    @Test
-    void updateTest() {
-        Author expected = authorRepository.findById(1L).get();
-        int expectedCount = authorRepository.findAll().size();
-        expected.setFullName("NewFullNameTest");
-        authorRepository.save(expected);
-        assertThat(expectedCount).isEqualTo(authorRepository.findAll().size());
-        Author actual = authorRepository.findById(1L).get();
-        assertThat(actual).isEqualTo(expected);
+    @ParameterizedTest
+    @MethodSource("getDbAuthors")
+    void updateTest(Author author) {
+        Author actual = em.find(Author.class, author.getId());
+        assertThat(actual).isNotNull().isEqualTo(author);
+        actual.setFullName("NewFullNameTest");
+        actual = repository.save(actual);
+        assertThat(actual).isNotNull()
+                .isNotEqualTo(author);
+        assertThat(em.find(Author.class, author.getId()))
+                .isNotNull().isEqualTo(actual);
     }
 
     private static List<Author> getDbAuthors() {
-        return IntStream.range(1, 4).boxed()
+        return IntStream.range(1, 5).boxed()
                 .map(id -> new Author(id, "Author_" + id))
                 .toList();
     }

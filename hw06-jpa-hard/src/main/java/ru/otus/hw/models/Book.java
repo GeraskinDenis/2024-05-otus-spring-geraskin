@@ -1,7 +1,24 @@
 package ru.otus.hw.models;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -13,16 +30,10 @@ import java.util.List;
 @NoArgsConstructor
 public class Book {
 
-    public Book(long id, String title, Author author, List<Genre> genres) {
-        this.id = id;
-        this.title = title;
-        this.author = author;
-        this.genres = genres;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
 
     @Column(nullable = false)
     private String title;
@@ -43,5 +54,12 @@ public class Book {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private List<BookComment> comments;
+
+    public Book(long id, String title, Author author, List<Genre> genres) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.genres = genres;
+    }
 }
 

@@ -21,9 +21,7 @@ public class JpaBookRepository implements BookRepository {
 
     @Override
     public Optional<Book> findById(long id) {
-        return Optional
-                .ofNullable(em.find(Book.class, id))
-                .or(Optional::empty);
+        return Optional.ofNullable(em.find(Book.class, id));
     }
 
     @Override
