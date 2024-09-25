@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.dto.BookCommentDto;
-import ru.otus.hw.exceptions.BookNotFoundException;
+import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.mappers.BookCommentMapper;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.BookComment;
@@ -31,7 +31,6 @@ public class BookCommentsServiceImpl implements BookCommentsService {
         return bookCommentsRepository.findById(id)
                 .map(bookCommentMapper::toDto);
     }
-
     @Transactional(readOnly = true)
     @Override
     public List<BookCommentDto> findAllByBookId(long bookId) {
@@ -48,7 +47,7 @@ public class BookCommentsServiceImpl implements BookCommentsService {
             throw new IllegalArgumentException("The comment text must not be empty.");
         }
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new BookNotFoundException("Book not found by ID:" + bookId));
+                .orElseThrow(() -> new EntityNotFoundException("Book not found by ID:" + bookId));
         BookComment bookComment = bookCommentsRepository.save(new BookComment(0, book, text));
         return bookCommentMapper.toDto(bookComment);
     }
@@ -60,7 +59,7 @@ public class BookCommentsServiceImpl implements BookCommentsService {
             throw new IllegalArgumentException("The comment text must not be empty.");
         }
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new BookNotFoundException("Book not found by ID:" + bookId));
+                .orElseThrow(() -> new EntityNotFoundException("Book not found by ID:" + bookId));
         BookComment bookComment = bookCommentsRepository.save(new BookComment(id, book, text));
         return bookCommentMapper.toDto(bookComment);
     }

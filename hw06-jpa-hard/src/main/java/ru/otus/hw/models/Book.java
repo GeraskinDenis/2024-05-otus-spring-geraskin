@@ -15,18 +15,18 @@ import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.List;
 
 @Entity
 @Table(name = "books")
-@NamedEntityGraph(name = "books-author-entity-graph",
-        attributeNodes = {@NamedAttributeNode("author")})
+@NamedEntityGraph(name = "book-entity-graph", attributeNodes = {@NamedAttributeNode("author")})
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 public class Book {
 
@@ -34,32 +34,29 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-
     @Column(nullable = false)
     private String title;
 
-    @ManyToOne(targetEntity = Author.class)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "author_id", nullable = false)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Author author;
 
-    @ManyToMany(targetEntity = Genre.class, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @Fetch(value = FetchMode.SELECT)
+    @BatchSize(size = 10)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "books_genres", joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id"))
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private List<Genre> genres;
 
-    @OneToMany(targetEntity = BookComment.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "book_id")
+    @Fetch(value = FetchMode.SELECT)
+    @BatchSize(size = 10)
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "book", orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private List<BookComment> comments;
-
-    public Book(long id, String title, Author author, List<Genre> genres) {
-        this.id = id;
-        this.title = title;
-        this.author = author;
-        this.genres = genres;
-    }
 }
 

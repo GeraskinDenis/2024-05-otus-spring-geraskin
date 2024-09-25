@@ -22,7 +22,7 @@ public class BookCommands {
     public String findAllBooks() {
         return bookService.findAll().stream()
                 .map(bookConverter::bookToString)
-                .collect(Collectors.joining("," + System.lineSeparator()));
+                .collect(Collectors.joining(System.lineSeparator()));
     }
 
     @ShellMethod(value = "Find book by id", key = "bf")

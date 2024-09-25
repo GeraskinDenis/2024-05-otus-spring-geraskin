@@ -1,0 +1,10 @@
+package ru.otus.hw.mappers;
+
+import ru.otus.hw.dto.AuthorDto;
+import ru.otus.hw.dto.BookCommentDto;
+import ru.otus.hw.models.Author;
+import ru.otus.hw.models.BookComment;
+
+public interface AuthorMapper {
+    AuthorDto toDto(Author author);
+}

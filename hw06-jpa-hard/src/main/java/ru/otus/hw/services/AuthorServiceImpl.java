@@ -3,6 +3,9 @@ package ru.otus.hw.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.otus.hw.dto.AuthorDto;
+import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mappers.AuthorMapper;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.repositories.AuthorRepository;
 
@@ -15,30 +18,32 @@ public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepository repository;
 
-    @Transactional(readOnly = true)
+    private final AuthorMapper authorMapper;
+
     @Override
-    public Optional<Author> findById(long id) {
-        return repository.findById(id);
+    public Optional<AuthorDto> findById(long id) {
+        Author author = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("The 'Author' not found by ID: " + id));
+        return Optional.of(authorMapper.toDto(author));
     }
 
-    @Transactional(readOnly = true)
     @Override
-    public List<Author> findAll() {
-        return repository.findAll();
-    }
-
-    @Transactional
-    @Override
-    public Author insert(String fullName) {
-        Author author = new Author();
-        author.setFullName(fullName);
-        return repository.save(author);
+    public List<AuthorDto> findAll() {
+        return repository.findAll().stream().map(authorMapper::toDto).toList();
     }
 
     @Transactional
     @Override
-    public Author update(long id, String fullName) {
-        return repository.save(new Author(id, fullName));
+    public AuthorDto insert(String fullName) {
+        Author author = new Author(0, fullName);
+        return authorMapper.toDto(author);
+    }
+
+    @Transactional
+    @Override
+    public AuthorDto update(long id, String fullName) {
+        Author author = repository.save(new Author(id, fullName));
+        return authorMapper.toDto(author);
     }
 
     @Transactional

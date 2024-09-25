@@ -28,7 +28,7 @@ public class AuthorCommands {
     public String findAll() {
         return authorService.findAll().stream()
                 .map(authorConverter::authorToString)
-                .collect(Collectors.joining("," + System.lineSeparator()));
+                .collect(Collectors.joining(System.lineSeparator()));
     }
 
     @ShellMethod(value = "Insert a new author", key = "ai")

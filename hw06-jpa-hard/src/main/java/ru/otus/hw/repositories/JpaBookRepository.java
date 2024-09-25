@@ -26,10 +26,10 @@ public class JpaBookRepository implements BookRepository {
 
     @Override
     public List<Book> findAll() {
-        EntityGraph<?> entityGraph = em.getEntityGraph("books-author-entity-graph");
+        EntityGraph<?> bookEntityGraph = em.getEntityGraph("book-entity-graph");
         String jpql = "SELECT e FROM Book e";
         return em.createQuery(jpql, Book.class)
-                .setHint(FETCH.getKey(), entityGraph)
+                .setHint(FETCH.getKey(), bookEntityGraph)
                 .getResultList();
     }
 

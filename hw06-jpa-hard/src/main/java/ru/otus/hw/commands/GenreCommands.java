@@ -27,7 +27,7 @@ public class GenreCommands {
     public String findAll() {
         return genreService.findAll().stream()
                 .map(genreConverter::genreToString)
-                .collect(Collectors.joining("," + System.lineSeparator()));
+                .collect(Collectors.joining(System.lineSeparator()));
     }
 
     @ShellMethod(value = "Insert a new genre", key = "gi")

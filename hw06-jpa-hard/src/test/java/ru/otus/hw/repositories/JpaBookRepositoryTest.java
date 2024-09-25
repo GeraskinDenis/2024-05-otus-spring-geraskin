@@ -49,7 +49,7 @@ class JpaBookRepositoryTest {
     @Test
     void shouldSaveNewBook() {
         var expectedBook = new Book(0, "BookTitle_10500", em.find(Author.class, 1),
-                List.of(em.find(Genre.class, 1), em.find(Genre.class, 2)));
+                List.of(em.find(Genre.class, 1), em.find(Genre.class, 2)), null);
         var returnedBook = repository.save(expectedBook);
         assertThat(returnedBook).isNotNull()
                 .matches(book -> book.getId() > 0)
@@ -62,7 +62,7 @@ class JpaBookRepositoryTest {
     @Test
     void shouldSaveUpdatedBook() {
         var expectedBook = new Book(1L, "BookTitle_10500", em.find(Author.class, 2),
-                List.of(em.find(Genre.class, 4), em.find(Genre.class, 5)));
+                List.of(em.find(Genre.class, 4), em.find(Genre.class, 5)), null);
         assertThat(em.find(Book.class, expectedBook.getId()))
                 .isNotEqualTo(expectedBook);
         var returnedBook = repository.save(expectedBook);
@@ -101,8 +101,7 @@ class JpaBookRepositoryTest {
                 .map(id -> new Book(id,
                         "BookTitle_" + id,
                         dbAuthors.get(id - 1),
-                        dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2)
-                ))
+                        dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2), null))
                 .toList();
     }
 
