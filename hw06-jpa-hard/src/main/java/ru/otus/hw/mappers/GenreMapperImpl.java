@@ -5,7 +5,7 @@ import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.models.Genre;
 
 @Component
-public class GenreMapperImpl implements GenreMapper{
+public class GenreMapperImpl implements GenreMapper {
     @Override
     public GenreDto toDto(Genre genre) {
         return new GenreDto(genre.getId(), genre.getName());

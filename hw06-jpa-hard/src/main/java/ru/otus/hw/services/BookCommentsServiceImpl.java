@@ -31,6 +31,7 @@ public class BookCommentsServiceImpl implements BookCommentsService {
         return bookCommentsRepository.findById(id)
                 .map(bookCommentMapper::toDto);
     }
+
     @Transactional(readOnly = true)
     @Override
     public List<BookCommentDto> findAllByBookId(long bookId) {
