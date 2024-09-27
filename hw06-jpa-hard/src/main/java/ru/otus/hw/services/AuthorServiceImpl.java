@@ -22,9 +22,11 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Optional<AuthorDto> findById(long id) {
-        Author author = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("The 'Author' not found by ID: " + id));
-        return Optional.of(authorMapper.toDto(author));
+        Optional<Author> author = repository.findById(id);
+        if(author.isPresent()){
+            return author.map(authorMapper::toDto);
+        }
+        return Optional.empty();
     }
 
     @Override

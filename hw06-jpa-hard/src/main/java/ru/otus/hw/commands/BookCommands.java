@@ -29,7 +29,7 @@ public class BookCommands {
     public String findBookById(@ShellOption(value = "id", help = "book ID for search") long id) {
         return bookService.findById(id)
                 .map(bookConverter::bookToString)
-                .orElse("Book with id %d not found".formatted(id));
+                .orElse("Book not found by ID (%s)".formatted(id));
     }
 
     @ShellMethod(value = "Insert a new book", key = "bi")
@@ -51,7 +51,8 @@ public class BookCommands {
     }
 
     @ShellMethod(value = "Delete book by id", key = "bd")
-    public void deleteBook(@ShellOption(value = "id", help = "book id for delete") long id) {
+    public String deleteBook(@ShellOption(value = "id", help = "book id for delete") long id) {
         bookService.deleteById(id);
+        return "Deletion Book by ID (%s) completed.".formatted(id);
     }
 }

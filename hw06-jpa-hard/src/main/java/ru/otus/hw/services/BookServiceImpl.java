@@ -32,9 +32,11 @@ public class BookServiceImpl implements BookService {
     @Transactional(readOnly = true)
     @Override
     public Optional<BookDto> findById(long id) {
-        var book = bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("The 'Book' not found by ID: " + id));
-        return Optional.of(bookMapper.toDto(book));
+        Optional<Book> book = bookRepository.findById(id);
+        if (book.isPresent()) {
+            return book.map(bookMapper::toDto);
+        }
+        return Optional.empty();
     }
 
     @Transactional(readOnly = true)

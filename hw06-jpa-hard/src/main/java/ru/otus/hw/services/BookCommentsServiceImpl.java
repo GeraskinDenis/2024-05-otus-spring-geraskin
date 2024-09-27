@@ -28,8 +28,11 @@ public class BookCommentsServiceImpl implements BookCommentsService {
     @Transactional(readOnly = true)
     @Override
     public Optional<BookCommentDto> findById(long id) {
-        return bookCommentsRepository.findById(id)
-                .map(bookCommentMapper::toDto);
+        Optional<BookComment> bookComment = bookCommentsRepository.findById(id);
+        if (bookComment.isPresent()) {
+            return bookComment.map(bookCommentMapper::toDto);
+        }
+        return Optional.empty();
     }
 
     @Transactional(readOnly = true)

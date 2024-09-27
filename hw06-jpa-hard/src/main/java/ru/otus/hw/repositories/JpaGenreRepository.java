@@ -25,9 +25,7 @@ public class JpaGenreRepository implements GenreRepository {
 
     @Override
     public Optional<Genre> findById(Long id) {
-        return Optional
-                .ofNullable(em.find(Genre.class, id))
-                .or(Optional::empty);
+        return Optional.ofNullable(em.find(Genre.class, id));
     }
 
     @Override

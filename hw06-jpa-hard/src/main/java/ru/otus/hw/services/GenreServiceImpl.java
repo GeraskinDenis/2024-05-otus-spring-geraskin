@@ -22,9 +22,11 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public Optional<GenreDto> findById(long id) {
-        Genre genre = genreRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("The 'Genre' not found by ID: " + id));
-        return Optional.of(genreMapper.toDto(genre));
+        Optional<Genre> genre = genreRepository.findById(id);
+        if (genre.isPresent()) {
+            return genre.map(genreMapper::toDto);
+        }
+        return Optional.empty();
     }
 
     @Override

@@ -20,7 +20,7 @@ public class GenreCommands {
     public String findById(@ShellOption(value = "id", help = "genre ID for search") long id) {
         return genreService.findById(id)
                 .map(genreConverter::genreToString)
-                .orElse("Genre with id %d not found".formatted(id));
+                .orElse("Genre not found by id (%s).".formatted(id));
     }
 
     @ShellMethod(value = "Find all genres", key = "ga")
@@ -44,6 +44,6 @@ public class GenreCommands {
     @ShellMethod(value = "Delete a genre by id", key = "gd")
     public String delete(@ShellOption(value = "id", help = "id of the genre to delete") long id) {
         genreService.deleteById(id);
-        return "Delete complete!";
+        return "Deletion Genre by ID (%s) completed.".formatted(id);
     }
 }

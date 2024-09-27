@@ -47,12 +47,12 @@ public class BookCommentCommands {
     @ShellMethod(value = "Delete a book comment by ID", key = "cd")
     public String deleteById(@ShellOption(value = "id", help = "book comment ID") long id) {
         bookCommentsService.deleteById(id);
-        return "Deleting a book comment by ID is complete!";
+        return "Deletion a Book comment by ID (%s) is completed.".formatted(id);
     }
 
     @ShellMethod(value = "Delete all book comments by book ID", key = "cda")
     public String deleteAllByBookId(@ShellOption(value = "bookId", help = "book ID") long bookId) {
         bookCommentsService.deleteAllByBookId(bookId);
-        return "Deleting all book comments by book ID is complete!";
+        return "Deleting all Book comments by book ID (%s) is completed.".formatted(bookId);
     }
 }

@@ -21,7 +21,7 @@ public class AuthorCommands {
     public String findById(@ShellOption(value = "id", help = "author ID for search") long id) {
         return authorService.findById(id)
                 .map(authorConverter::authorToString)
-                .orElse("Author with id %d not found".formatted(id));
+                .orElse("Author not found by id (%d).".formatted(id));
     }
 
     @ShellMethod(value = "Find all authors", key = "aa")
@@ -45,6 +45,6 @@ public class AuthorCommands {
     @ShellMethod(value = "Delete author by ID", key = "ad")
     public String delete(@ShellOption(value = "id", help = "author ID to delete") long id) {
         authorService.deleteById(id);
-        return "Delete complete!";
+        return "Deletion Author by ID (%s) completed.".formatted(id);
     }
 }
