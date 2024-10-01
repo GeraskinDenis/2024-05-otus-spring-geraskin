@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class BookCommentsServiceImpl implements BookCommentsService {
+public class BookCommentServiceImpl implements BookCommentService {
 
     private final BookCommentsRepository bookCommentsRepository;
 

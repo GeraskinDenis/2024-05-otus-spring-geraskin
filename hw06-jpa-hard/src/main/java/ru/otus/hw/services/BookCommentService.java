@@ -6,7 +6,7 @@ import ru.otus.hw.dto.BookCommentDto;
 import java.util.List;
 import java.util.Optional;
 
-public interface BookCommentsService {
+public interface BookCommentService {
     Optional<BookCommentDto> findById(long id);
 
     @Transactional(readOnly = true)

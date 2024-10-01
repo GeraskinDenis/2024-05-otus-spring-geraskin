@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Сервис работы с Книгами")
 @DataJpaTest
-@Transactional
 @Import({BookServiceImpl.class, JpaAuthorRepository.class, JpaGenreRepository.class,
         JpaBookRepository.class, BookMapperImpl.class, AuthorMapperImpl.class,
         GenreMapperImpl.class, BookCommentMapperImpl.class})
@@ -36,7 +35,7 @@ public class BookServiceImplTest {
     @MethodSource("getBookDtos")
     void shouldReturnCorrectBookById(BookDto expectedBookDto) {
         assertThat(bookService.findById(expectedBookDto.id()))
-                .isPresent().get().isEqualTo(expectedBookDto);
+                .isPresent().contains(expectedBookDto);
     }
 
     @DisplayName("Должен загружать список всех книг")
@@ -123,5 +122,6 @@ public class BookServiceImplTest {
         var bookCommentDtos = getBookCommentDtos();
         return getBookDtos(authorDtos, genreDtos, bookCommentDtos);
     }
+
 
 }
