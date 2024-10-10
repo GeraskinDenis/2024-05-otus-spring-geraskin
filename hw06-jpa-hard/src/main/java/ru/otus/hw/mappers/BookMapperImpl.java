@@ -16,17 +16,12 @@ public class BookMapperImpl implements BookMapper {
 
     private final GenreMapper genreMapper;
 
-    private final BookCommentMapper bookCommentMapper;
-
     @Override
     public BookDto toDto(Book book) {
         return new BookDto(
                 book.getId(),
                 book.getTitle(),
                 authorMapper.toDto(book.getAuthor()),
-                book.getGenres().stream().map(genreMapper::toDto).toList(),
-                Objects.nonNull(book.getComments())
-                        ? book.getComments().stream().map(bookCommentMapper::toDto).toList()
-                        : new ArrayList<>());
+                book.getGenres().stream().map(genreMapper::toDto).toList());
     }
 }

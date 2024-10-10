@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.BookComment;
@@ -32,7 +34,7 @@ class JpaBookCommentsRepositoryTest {
     @DisplayName("должен загружать комментарий к книге по id")
     @ParameterizedTest
     @MethodSource("getDbBookComments")
-    void shouldReturnCorrectBookById(BookComment expectedBookComment) {
+    void shouldReturnAllBookCommentsByBookId(BookComment expectedBookComment) {
         var actualBookComment = repository.findById(expectedBookComment.getId());
         assertThat(actualBookComment).isPresent().get()
                 .isEqualTo(expectedBookComment);
@@ -52,7 +54,7 @@ class JpaBookCommentsRepositoryTest {
     @DisplayName("должен сохранять новый комментарий")
     @ParameterizedTest
     @MethodSource("getDbBooks")
-    void shouldSaveNew(Book book) {
+    void shouldSaveNewBookComment(Book book) {
         var expectedBookComment = new BookComment(0, book, "Book_%s_test_comment".formatted(book.getId()));
         var returnedBookComment = repository.save(expectedBookComment);
         assertThat(returnedBookComment).isNotNull()
@@ -65,7 +67,7 @@ class JpaBookCommentsRepositoryTest {
     @DisplayName("должен сохранять измененный комментарий")
     @ParameterizedTest
     @MethodSource("getDbBookComments")
-    void shouldSaveUpdatedBookComment(BookComment bookComment) {
+    void shouldUpdatedBookComment(BookComment bookComment) {
         BookComment expectedBookComment = em.find(BookComment.class, bookComment.getId());
         BookComment actualBookComment = em.find(BookComment.class, expectedBookComment.getId());
         assertThat(actualBookComment).isEqualTo(expectedBookComment);
@@ -83,7 +85,7 @@ class JpaBookCommentsRepositoryTest {
     @DisplayName("должен удалить комментарий по ID")
     @ParameterizedTest
     @MethodSource("getDbBookComments")
-    void shouldDeleteBook(BookComment bookComment) {
+    void shouldDeleteBookCommentById(BookComment bookComment) {
         assertThat(em.find(BookComment.class, bookComment.getId())).isNotNull().isEqualTo(bookComment);
         repository.deleteById(bookComment.getId());
         assertThat(em.find(BookComment.class, bookComment.getId())).isNull();
@@ -92,13 +94,29 @@ class JpaBookCommentsRepositoryTest {
     @DisplayName("должен удалять все комментарии по ID книги")
     @ParameterizedTest
     @MethodSource("getDbBooks")
-    void shouldDeleteBook(Book book) {
-        List<BookComment> actualBookComments = repository.findAllByBookId(book.getId());
+    void shouldDeleteAllBookCommentsByBookId(Book book) {
+        Book actualBook = em.find(Book.class, book.getId());
+        List<BookComment> actualBookComments = actualBook.getComments();
         assertThat(actualBookComments).isNotNull()
                 .matches(list -> !list.isEmpty())
                 .containsExactlyElementsOf(book.getComments());
         repository.deleteAllByBookId(book.getId());
-        actualBookComments = repository.findAllByBookId(book.getId());
+        // если получаем комментарии по одному, то все хорошо
+        book.getComments().forEach(i -> {
+            assertThat(em.find(BookComment.class, i.getId()))
+                    .isNull();
+        });
+        // А вот тут не могу понять почему код ниже находит
+        // у книги удаленные комментарии?
+        // Пробовал отключать объекты от контекста
+        //        em.detach(actualBook);
+        //        actualBookComments.forEach(em::detach);
+
+        // Получаю книгу из БД заново
+        actualBook = em.find(Book.class, book.getId());
+        // т.к. мы в транзакции, то получаем все комментарии книги из LAZY-поля
+        actualBookComments = actualBook.getComments();
+        // Проверка не проходит т.к. комментарии найдены. Почему?
         assertThat(actualBookComments).isNotNull()
                 .matches(List::isEmpty);
     }
@@ -126,7 +144,7 @@ class JpaBookCommentsRepositoryTest {
         return IntStream.range(1, 4).boxed()
                 .map(id ->
                         new Book(id, "BookTitle_" + id, dbAuthors.get(id - 1),
-                        dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2), null))
+                                dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2), null))
                 .toList();
     }
 

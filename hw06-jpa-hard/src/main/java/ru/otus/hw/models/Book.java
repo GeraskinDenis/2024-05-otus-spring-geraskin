@@ -47,8 +47,7 @@ public class Book {
     @ToString.Exclude
     private Author author;
 
-    @Fetch(value = FetchMode.SELECT)
-    @BatchSize(size = 10)
+    @Fetch(value = FetchMode.SUBSELECT)
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "books_genres", joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id"))

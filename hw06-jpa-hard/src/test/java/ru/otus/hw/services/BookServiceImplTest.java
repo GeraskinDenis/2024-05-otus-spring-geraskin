@@ -51,7 +51,7 @@ public class BookServiceImplTest {
     void shouldSaveNewBook() {
         var authorDto = new AuthorDto(1L, "Author_1");
         var genreDtos = List.of(new GenreDto(1, "Genre_1"), new GenreDto(2, "Genre_2"));
-        var expectedBookDto = new BookDto(4, "BookTitle_10500", authorDto, genreDtos, new ArrayList<>());
+        var expectedBookDto = new BookDto(4, "BookTitle_10500", authorDto, genreDtos);
         var returnedBookDto = bookService.insert("BookTitle_10500", 1L, Set.of(1L, 2L));
         assertThat(returnedBookDto).isNotNull()
                 .matches(bookDto -> bookDto.id() > 0)
@@ -64,7 +64,7 @@ public class BookServiceImplTest {
     void shouldUpdatedBook() {
         var authorDto = new AuthorDto(1L, "Author_1");
         var genreDtos = List.of(new GenreDto(1L, "Genre_1"), new GenreDto(2L, "Genre_2"));
-        var expectedBookDto = new BookDto(1L, "BookTitle_10500", authorDto, genreDtos, new ArrayList<>());
+        var expectedBookDto = new BookDto(1L, "BookTitle_10500", authorDto, genreDtos);
         var returnedBookDto = bookService.update(1L, "BookTitle_10500", 1L, Set.of(1L, 2L));
         assertThat(returnedBookDto).isEqualTo(expectedBookDto);
         assertThat(bookService.findById(returnedBookDto.id())).contains(expectedBookDto);
@@ -111,7 +111,7 @@ public class BookServiceImplTest {
                 .map(id -> new BookDto(id,
                         "BookTitle_" + id,
                         authorDtos.get(id - 1),
-                        genreDtos.subList((id - 1) * 2, (id - 1) * 2 + 2), booksCommentDtos.get((long) id)))
+                        genreDtos.subList((id - 1) * 2, (id - 1) * 2 + 2)))
                 .toList();
     }
 
