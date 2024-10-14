@@ -93,30 +93,29 @@ class JpaBookCommentsRepositoryTest {
 
     @DisplayName("должен удалять все комментарии по ID книги")
     @ParameterizedTest
-    @MethodSource("getDbBooks")
-    void shouldDeleteAllBookCommentsByBookId(Book book) {
-        Book actualBook = em.find(Book.class, book.getId());
+    @MethodSource("getBookIds")
+    void shouldDeleteAllBookCommentsByBookId(int bookId) {
+        Book actualBook = em.find(Book.class, bookId);
         List<BookComment> actualBookComments = actualBook.getComments();
         assertThat(actualBookComments).isNotNull()
-                .matches(list -> !list.isEmpty())
-                .containsExactlyElementsOf(book.getComments());
-        repository.deleteAllByBookId(book.getId());
-        // если получаем комментарии по одному, то все хорошо
-        book.getComments().forEach(i -> {
-            assertThat(em.find(BookComment.class, i.getId()))
-                    .isNull();
-        });
-        // А вот тут не могу понять почему код ниже находит
-        // у книги удаленные комментарии?
-        // Пробовал отключать объекты от контекста
-        //        em.detach(actualBook);
-        //        actualBookComments.forEach(em::detach);
+                .matches(list -> !list.isEmpty());
+        // Удаляем комментарии по ИД книги
+        repository.deleteAllByBookId(bookId);
+        // т.к. сессия открыта, то моментальное удаление в БД не происходит
+        // удаление произойдет после выхода из метода и перед закрытием сессии с БД
+
+        // Синхронизируем изменения с БД, запускаем отложенные запросы
+        em.flush();
+        // Запросы выполнены, в БД все удалилось, но книга все еще в кеше
+
+        // Отключаем книгу от кэша
+        em.detach(actualBook);
 
         // Получаю книгу из БД заново
-        actualBook = em.find(Book.class, book.getId());
+        actualBook = em.find(Book.class, bookId);
         // т.к. мы в транзакции, то получаем все комментарии книги из LAZY-поля
         actualBookComments = actualBook.getComments();
-        // Проверка не проходит т.к. комментарии найдены. Почему?
+        // Выполняем проверку наличия Комментариев
         assertThat(actualBookComments).isNotNull()
                 .matches(List::isEmpty);
     }
@@ -170,5 +169,9 @@ class JpaBookCommentsRepositoryTest {
             book.setComments(list);
         }
         return bookComments;
+    }
+
+    private static List<Integer> getBookIds() {
+        return List.of(1, 2, 3);
     }
 }
