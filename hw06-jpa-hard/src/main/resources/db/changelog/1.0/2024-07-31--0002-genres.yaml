@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2024-07-31--0002-genres
+      author: GeraskinDS
+      createTable:
+        tableName: genres
+        columns:
+          - column:
+              name: id
+              type: bigint
+              autoIncrement: true
+              constraints:
+                nullable: false
+                primaryKey: true
+          - column:
+              name: name
+              type: varchar(255)
+              constraints:
+                nullable: false
+                unique: true

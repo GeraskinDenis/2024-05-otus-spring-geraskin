@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2024-07-31--0005-add_primary_key
+      author: GeraskinDS
+      changes:
+        - addPrimaryKey:
+            tableName: books_genres
+            columnNames: book_id, genre_id
+            validate: true
