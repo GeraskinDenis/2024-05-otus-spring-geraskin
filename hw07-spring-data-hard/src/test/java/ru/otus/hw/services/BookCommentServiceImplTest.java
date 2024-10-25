@@ -20,8 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Сервис работы с Комментариями книг")
 @DataJpaTest
-@Import({BookCommentServiceImpl.class, BookCommentsRepository.class,
-        BookCommentMapperImpl.class, BookRepository.class})
+@Import(value = {BookCommentServiceImpl.class, BookCommentMapperImpl.class})
 public class BookCommentServiceImplTest {
 
     @Autowired

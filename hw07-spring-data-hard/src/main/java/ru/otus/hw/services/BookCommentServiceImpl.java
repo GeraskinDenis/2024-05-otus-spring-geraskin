@@ -11,6 +11,7 @@ import ru.otus.hw.models.BookComment;
 import ru.otus.hw.repositories.BookCommentsRepository;
 import ru.otus.hw.repositories.BookRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -38,11 +39,11 @@ public class BookCommentServiceImpl implements BookCommentService {
     @Transactional(readOnly = true)
     @Override
     public List<BookCommentDto> findByBook(long bookId) {
-        Book book = getExistingBookById(bookId);
-        return bookCommentsRepository.findByBook(book)
+        Optional<Book> optionalBook = bookRepository.findById(bookId);
+        return optionalBook.map(book -> bookCommentsRepository.findByBook(book)
                 .stream()
                 .map(bookCommentMapper::toDto)
-                .toList();
+                .toList()).orElseGet(ArrayList::new);
     }
 
     @Transactional
@@ -78,8 +79,8 @@ public class BookCommentServiceImpl implements BookCommentService {
     @Transactional
     @Override
     public void deleteAllByBookId(long bookId) {
-        Book book = getExistingBookById(bookId);
-        bookCommentsRepository.deleteByBook(book);
+//        Book book = getExistingBookById(bookId);
+        bookCommentsRepository.deleteByBookId(bookId);
     }
 
     private Book getExistingBookById(Long bookId) {

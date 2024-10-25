@@ -76,7 +76,16 @@ public class BookServiceImpl implements BookService {
             String genreIdsStr = genreIds.stream().map(String::valueOf).collect(Collectors.joining(", "));
             throw new EntityNotFoundException("One or more genres with ids [%s] not found".formatted(genreIdsStr));
         }
-        var book = new Book(id, title, author, genres, null);
+        Book book;
+        if (id == 0) {
+            book = new Book(id, title, author, genres);
+        } else {
+            book = bookRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(id)));
+            book.setTitle(title);
+            book.setAuthor(author);
+            book.setGenres(genres);
+        }
         return bookRepository.save(book);
     }
 }

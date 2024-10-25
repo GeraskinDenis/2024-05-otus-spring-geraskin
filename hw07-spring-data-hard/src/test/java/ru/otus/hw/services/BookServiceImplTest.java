@@ -21,8 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Сервис работы с Книгами")
 @DataJpaTest
-@Import({BookServiceImpl.class, AuthorRepository.class, GenreRepository.class,
-        BookRepository.class, BookMapperImpl.class, AuthorMapperImpl.class,
+@Import({BookServiceImpl.class, BookMapperImpl.class, AuthorMapperImpl.class,
         GenreMapperImpl.class, BookCommentMapperImpl.class})
 public class BookServiceImplTest {
 

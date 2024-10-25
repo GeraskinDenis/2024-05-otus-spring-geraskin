@@ -5,8 +5,11 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import ru.otus.hw.converters.BookCommentConverter;
+import ru.otus.hw.dto.BookCommentDto;
+import ru.otus.hw.models.BookComment;
 import ru.otus.hw.services.BookCommentService;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @ShellComponent
@@ -20,15 +23,18 @@ public class BookCommentCommands {
     public String findById(@ShellOption(value = "id", help = "book comment ID") long id) {
         return bookCommentService.findById(id)
                 .map(bookCommentConverter::bookCommentToString)
-                .orElse("No comment found for book by ID: " + id);
+                .orElse("No book comment found by ID: " + id);
     }
 
     @ShellMethod(value = "Find all comments by book ID", key = "ca")
     public String findAllByBookId(@ShellOption(value = "bookId", help = "book id") long bookId) {
-        return bookCommentService
-                .findByBook(bookId)
-                .stream().map(bookCommentConverter::bookCommentToString)
-                .collect(Collectors.joining(System.lineSeparator()));
+        List<BookCommentDto> list = bookCommentService.findByBook(bookId);
+        if (list.isEmpty()) {
+            return "No book comments found by book ID: " + bookId;
+        } else {
+            return list.stream().map(bookCommentConverter::bookCommentToString)
+                    .collect(Collectors.joining(System.lineSeparator()));
+        }
     }
 
     @ShellMethod(value = "Insert a new book comment", key = "ci")
@@ -38,7 +44,7 @@ public class BookCommentCommands {
     }
 
     @ShellMethod(value = "Update a book comment", key = "cu")
-    public String insert(@ShellOption(value = "id", help = "book comment ID") long id,
+    public String update(@ShellOption(value = "id", help = "book comment ID") long id,
                          @ShellOption(value = "bookId", help = "Book ID") long bookId,
                          @ShellOption(value = "textComment", help = "text of comment") String textComment) {
         return bookCommentConverter.bookCommentToString(bookCommentService.update(id, bookId, textComment));

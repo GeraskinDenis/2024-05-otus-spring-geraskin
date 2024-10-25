@@ -42,7 +42,7 @@ class BookCommentsRepositoryTest {
     @ParameterizedTest
     @MethodSource("getDbBooks")
     void shouldReturnCorrectBookCommentsListByBookId(Book book) {
-        var actualBookComments = repository.findByBook(book.getId());
+        var actualBookComments = repository.findByBook(book);
         var expectedBookComments = book.getComments();
         assertThat(actualBookComments).containsExactlyElementsOf(expectedBookComments);
         actualBookComments.forEach(System.out::println);
@@ -96,7 +96,7 @@ class BookCommentsRepositoryTest {
         List<BookComment> actualBookComments = actualBook.getComments();
         assertThat(actualBookComments).isNotNull()
                 .matches(list -> !list.isEmpty());
-        repository.deleteByBook(bookId);
+        repository.deleteByBookId(bookId);
         em.flush();
         em.detach(actualBook);
         actualBook = em.find(Book.class, bookId);
@@ -128,7 +128,7 @@ class BookCommentsRepositoryTest {
         return IntStream.range(1, 4).boxed()
                 .map(id ->
                         new Book(id, "BookTitle_" + id, dbAuthors.get(id - 1),
-                                dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2), null))
+                                dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2)))
                 .toList();
     }
 

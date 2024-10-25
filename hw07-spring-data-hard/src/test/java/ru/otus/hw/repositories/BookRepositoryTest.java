@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Репозиторий на основе JPA для работы с книгами ")
 @DataJpaTest
-//@Import({BookRepository.class, GenreRepository.class})
 class BookRepositoryTest {
 
     @Autowired
@@ -48,7 +47,7 @@ class BookRepositoryTest {
     @Test
     void shouldSaveNewBook() {
         var expectedBook = new Book(0, "BookTitle_10500", em.find(Author.class, 1),
-                List.of(em.find(Genre.class, 1), em.find(Genre.class, 2)), null);
+                List.of(em.find(Genre.class, 1), em.find(Genre.class, 2)));
         var returnedBook = repository.save(expectedBook);
         assertThat(returnedBook).isNotNull()
                 .matches(book -> book.getId() > 0)
@@ -61,7 +60,7 @@ class BookRepositoryTest {
     @Test
     void shouldSaveUpdatedBook() {
         var expectedBook = new Book(1L, "BookTitle_10500", em.find(Author.class, 2),
-                List.of(em.find(Genre.class, 4), em.find(Genre.class, 5)), null);
+                List.of(em.find(Genre.class, 4), em.find(Genre.class, 5)));
         assertThat(em.find(Book.class, expectedBook.getId()))
                 .isNotEqualTo(expectedBook);
         var returnedBook = repository.save(expectedBook);
@@ -100,7 +99,7 @@ class BookRepositoryTest {
                 .map(id -> new Book(id,
                         "BookTitle_" + id,
                         dbAuthors.get(id - 1),
-                        dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2), null))
+                        dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2)))
                 .toList();
     }
 
