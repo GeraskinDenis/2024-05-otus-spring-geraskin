@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.dto.AuthorDto;
+import ru.otus.hw.dto.Report;
 import ru.otus.hw.mappers.AuthorMapper;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.repositories.AuthorRepository;
+import ru.otus.hw.repositories.projections.NumberOfBooksByAuthors;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +36,13 @@ public class AuthorServiceImpl implements AuthorService {
         return authorRepository.findAll().stream().map(authorMapper::toDto).toList();
     }
 
+    @Override
+    public Report getNumberOfBooksByAuthors() {
+        String reportName = "--- The number of books by authors ---";
+        List<NumberOfBooksByAuthors> dataList = authorRepository.getNumberOfBooksByAuthors();
+        return new Report(reportName, convertToRows(dataList));
+    }
+
     @Transactional
     @Override
     public AuthorDto insert(String fullName) {
@@ -53,6 +63,15 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public void deleteById(long id) {
         authorRepository.deleteById(id);
+    }
+
+    private List<List<String>> convertToRows(List<NumberOfBooksByAuthors> dataList) {
+        List<List<String>> rows = new ArrayList<>(dataList.size());
+        rows.add(List.of("Author", "Number"));
+        for (NumberOfBooksByAuthors data : dataList) {
+            rows.add(List.of(data.getFullName(), data.getNumber().toString()));
+        }
+        return rows;
     }
 }
 

@@ -5,6 +5,7 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import ru.otus.hw.converters.AuthorConverter;
+import ru.otus.hw.converters.ReportConverter;
 import ru.otus.hw.services.AuthorService;
 
 import java.util.stream.Collectors;
@@ -17,11 +18,12 @@ public class AuthorCommands {
 
     private final AuthorConverter authorConverter;
 
-    @ShellMethod(value = "Find author by ID", key = "af")
-    public String findById(@ShellOption(value = "id", help = "author ID for search") long id) {
-        return authorService.findById(id)
-                .map(authorConverter::authorToString)
-                .orElse("Author not found by id (%d).".formatted(id));
+    private final ReportConverter reportConverter;
+
+    @ShellMethod(value = "Delete author by ID", key = "ad")
+    public String delete(@ShellOption(value = "id", help = "author ID to delete") long id) {
+        authorService.deleteById(id);
+        return "Deletion Author by ID (%s) completed.".formatted(id);
     }
 
     @ShellMethod(value = "Find all authors", key = "aa")
@@ -29,6 +31,18 @@ public class AuthorCommands {
         return authorService.findAll().stream()
                 .map(authorConverter::authorToString)
                 .collect(Collectors.joining(System.lineSeparator()));
+    }
+
+    @ShellMethod(value = "Find author by ID", key = "af")
+    public String findById(@ShellOption(value = "id", help = "author ID for search") long id) {
+        return authorService.findById(id)
+                .map(authorConverter::authorToString)
+                .orElse("Author not found by id (%d).".formatted(id));
+    }
+
+    @ShellMethod(value = "Get number of books by authors", key = "author-report-1")
+    public String getNumberOfBooksByAuthors() {
+        return reportConverter.reportToString(authorService.getNumberOfBooksByAuthors());
     }
 
     @ShellMethod(value = "Insert a new author", key = "ai")
@@ -40,11 +54,5 @@ public class AuthorCommands {
     public String update(@ShellOption(value = "id", help = "author ID to update") long id,
                          @ShellOption(value = "full_name", help = "new full name") String fullName) {
         return authorConverter.authorToString(authorService.update(id, fullName));
-    }
-
-    @ShellMethod(value = "Delete author by ID", key = "ad")
-    public String delete(@ShellOption(value = "id", help = "author ID to delete") long id) {
-        authorService.deleteById(id);
-        return "Deletion Author by ID (%s) completed.".formatted(id);
     }
 }

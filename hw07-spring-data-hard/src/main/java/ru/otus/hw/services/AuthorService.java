@@ -1,11 +1,14 @@
 package ru.otus.hw.services;
 
 import ru.otus.hw.dto.AuthorDto;
+import ru.otus.hw.dto.Report;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface AuthorService {
+    Report getNumberOfBooksByAuthors();
+
     Optional<AuthorDto> findById(long id);
 
     List<AuthorDto> findAll();
