@@ -47,6 +47,27 @@ public class BookServiceImpl implements BookService {
                 .map(bookMapper::toDto).toList();
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public List<BookDto> findByTitleLike(String titleSubstring) {
+        return bookRepository.findByTitleLike("%" + titleSubstring + "%")
+                .stream().map(bookMapper::toDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<BookDto> findByAuthorFullNameLike(String authorFullNameSubstring) {
+        return bookRepository.findByAuthorFullNameLike("%" + authorFullNameSubstring + "%")
+                .stream().map(bookMapper::toDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Optional<BookDto> findWithMaxId() {
+        return bookRepository.findWithMaxId()
+                .map(bookMapper::toDto);
+    }
+
     @Transactional
     @Override
     public BookDto insert(String title, long authorId, Set<Long> genreIds) {
@@ -64,6 +85,19 @@ public class BookServiceImpl implements BookService {
     public void deleteById(long id) {
         bookRepository.deleteById(id);
     }
+
+//    private List<List<String>> bookConvertToRow(List<Book> books) {
+//        List<List<String>> rows = new ArrayList<>(books.size());
+//        rows.add(List.of("№", "ID", "Title", "Author"));
+//        int i = 0;
+//        for (Book book : books) {
+//            rows.add(List.of(String.valueOf(++i),
+//                    String.valueOf(book.getId()),
+//                    String.valueOf(book.getTitle()),
+//                    String.valueOf(book.getAuthor().getFullName())));
+//        }
+//        return rows;
+//    }
 
     private Book save(long id, String title, long authorId, Set<Long> genreIds) {
         if (isEmpty(genreIds)) {
