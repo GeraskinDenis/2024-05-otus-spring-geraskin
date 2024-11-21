@@ -22,7 +22,7 @@ public class GenreReportServiceImpl implements GenreReportService {
 
     private List<List<String>> convertToRows(List<Map<String, Object>> rowDataList) {
         List<List<String>> rows = new ArrayList<>();
-        rows.add(List.of("№", "Genre", "Number"));
+        rows.add(List.of("№", "Genre", "Number of books"));
         List<String> fieldNames = new ArrayList<>();
         fieldNames.add("name");
         fieldNames.add("number");

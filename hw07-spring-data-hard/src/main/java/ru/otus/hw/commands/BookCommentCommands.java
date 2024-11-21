@@ -6,7 +6,6 @@ import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import ru.otus.hw.converters.BookCommentConverter;
 import ru.otus.hw.dto.BookCommentDto;
-import ru.otus.hw.models.BookComment;
 import ru.otus.hw.services.BookCommentService;
 
 import java.util.List;
@@ -18,6 +17,18 @@ public class BookCommentCommands {
     private final BookCommentService bookCommentService;
 
     private final BookCommentConverter bookCommentConverter;
+
+    @ShellMethod(value = "Delete all book comments by book ID", key = "cda")
+    public String deleteAllByBookId(@ShellOption(value = "bookId", help = "book ID") long bookId) {
+        bookCommentService.deleteAllByBookId(bookId);
+        return "Deleting all Book comments by book ID (%s) is completed.".formatted(bookId);
+    }
+
+    @ShellMethod(value = "Delete a book comment by ID", key = "cd")
+    public String deleteById(@ShellOption(value = "id", help = "book comment ID") long id) {
+        bookCommentService.deleteById(id);
+        return "Deletion a Book comment by ID (%s) is completed.".formatted(id);
+    }
 
     @ShellMethod(value = "Find a book comment by ID", key = "cf")
     public String findById(@ShellOption(value = "id", help = "book comment ID") long id) {
@@ -37,6 +48,11 @@ public class BookCommentCommands {
         }
     }
 
+    @ShellMethod(value = "Get the number of book comments by book Id", key = "cn")
+    public String getNumberByBookId(@ShellOption(value = "bookId", help = "BookID") long bookId) {
+        return bookCommentService.getNumberByBookId(bookId).toString();
+    }
+
     @ShellMethod(value = "Insert a new book comment", key = "ci")
     public String insert(@ShellOption(value = "bookId", help = "Book ID") long bookId,
                          @ShellOption(value = "textComment", help = "text of comment") String textComment) {
@@ -48,17 +64,5 @@ public class BookCommentCommands {
                          @ShellOption(value = "bookId", help = "Book ID") long bookId,
                          @ShellOption(value = "textComment", help = "text of comment") String textComment) {
         return bookCommentConverter.bookCommentToString(bookCommentService.update(id, bookId, textComment));
-    }
-
-    @ShellMethod(value = "Delete a book comment by ID", key = "cd")
-    public String deleteById(@ShellOption(value = "id", help = "book comment ID") long id) {
-        bookCommentService.deleteById(id);
-        return "Deletion a Book comment by ID (%s) is completed.".formatted(id);
-    }
-
-    @ShellMethod(value = "Delete all book comments by book ID", key = "cda")
-    public String deleteAllByBookId(@ShellOption(value = "bookId", help = "book ID") long bookId) {
-        bookCommentService.deleteAllByBookId(bookId);
-        return "Deleting all Book comments by book ID (%s) is completed.".formatted(bookId);
     }
 }

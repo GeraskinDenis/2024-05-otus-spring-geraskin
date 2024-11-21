@@ -8,7 +8,9 @@ import java.util.List;
 
 public interface BookCommentsRepository extends ListCrudRepository<BookComment, Long> {
 
-    List<BookComment> findByBook(Book book);
+    int countByBookId(Long bookId);
 
     void deleteByBookId(Long bookId);
+
+    List<BookComment> findByBook(Book book);
 }

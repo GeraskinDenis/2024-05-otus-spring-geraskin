@@ -5,9 +5,6 @@ import org.springframework.stereotype.Component;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.models.Book;
 
-import java.util.ArrayList;
-import java.util.Objects;
-
 @Component
 @RequiredArgsConstructor
 public class BookMapperImpl implements BookMapper {

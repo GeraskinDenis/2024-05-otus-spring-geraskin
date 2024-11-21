@@ -26,6 +26,23 @@ public class BookCommentServiceImpl implements BookCommentService {
 
     private final BookRepository bookRepository;
 
+    @Override
+    public Integer getNumberByBookId(Long id) {
+        return bookCommentsRepository.countByBookId(id);
+    }
+
+    @Transactional
+    @Override
+    public void deleteAllByBookId(long bookId) {
+        bookCommentsRepository.deleteByBookId(bookId);
+    }
+
+    @Transactional
+    @Override
+    public void deleteById(long bookCommentId) {
+        bookCommentsRepository.deleteById(bookCommentId);
+    }
+
     @Transactional(readOnly = true)
     @Override
     public Optional<BookCommentDto> findById(long id) {
@@ -68,19 +85,6 @@ public class BookCommentServiceImpl implements BookCommentService {
                 .orElseThrow(() -> new EntityNotFoundException("Book not found by ID:" + bookId));
         BookComment bookComment = bookCommentsRepository.save(new BookComment(id, book, text));
         return bookCommentMapper.toDto(bookComment);
-    }
-
-    @Transactional
-    @Override
-    public void deleteById(long bookCommentId) {
-        bookCommentsRepository.deleteById(bookCommentId);
-    }
-
-    @Transactional
-    @Override
-    public void deleteAllByBookId(long bookId) {
-//        Book book = getExistingBookById(bookId);
-        bookCommentsRepository.deleteByBookId(bookId);
     }
 
     private Book getExistingBookById(Long bookId) {

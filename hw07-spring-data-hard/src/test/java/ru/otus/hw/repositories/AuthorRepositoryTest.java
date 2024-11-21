@@ -1,22 +1,29 @@
 package ru.otus.hw.repositories;
 
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 import ru.otus.hw.models.Author;
+import ru.otus.hw.repositories.projections.NumberOfBooksByAuthor;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatList;
 
 @DisplayName("Репозиторий на основе JPA для работы с 'Авторами'")
 @DataJpaTest
@@ -58,6 +65,38 @@ public class AuthorRepositoryTest {
     void findByIdTestCase2() {
         Optional<Author> actual = repository.findById(10L);
         assertThat(actual).isEmpty();
+    }
+
+    @DisplayName("should return the correct number of books by author")
+    @Test
+    void getNumberOfBooksByAuthors() {
+        // Данная реализация мне не очень нравиться. Метод equals() для сравнения объектов не подходит, т.к. разные Классы.
+        // Был вариант использовать Map для проверки, но отталкивала мысль о том, что Проекция может иметь больше двух полей
+        // Так же старался, что бы реализация содержала как можно меньше кода, что бы его тоже не пришлось тестировать.
+        // Но кода получилось много для тестового метода, но он понятный и простой.
+        List<NumberOfBooksByAuthor> expected = getListOfNumberOfBooksByAuthors();
+        List<NumberOfBooksByAuthor> actual = repository.getNumberOfBooksByAuthors();
+        assertThat(actual.size()).isEqualTo(expected.size());
+        for (NumberOfBooksByAuthor a : actual) {
+            boolean exists = false;
+            for (NumberOfBooksByAuthor e : expected) {
+                if (a.getAuthorFullName().equals(e.getAuthorFullName())) {
+                    exists = true;
+                    assertThat(a.getNumber()).isEqualTo(e.getNumber());
+                }
+            }
+            assertThat(exists).isTrue();
+        }
+        for (NumberOfBooksByAuthor e : expected) {
+            boolean exists = false;
+            for (NumberOfBooksByAuthor a : actual) {
+                if (a.getAuthorFullName().equals(e.getAuthorFullName())) {
+                    exists = true;
+                    assertThat(a.getNumber()).isEqualTo(e.getNumber());
+                }
+            }
+            assertThat(exists).isTrue();
+        }
     }
 
     @DisplayName("should save a new Author correctly")
@@ -105,4 +144,18 @@ public class AuthorRepositoryTest {
                 .map(id -> new Author(id, "Author_" + id))
                 .toList();
     }
+
+    private List<NumberOfBooksByAuthor> getListOfNumberOfBooksByAuthors() {
+        Map<String, Integer> expectedData = new HashMap<>(3);
+        expectedData.put("Author_1", 1);
+        expectedData.put("Author_2", 1);
+        expectedData.put("Author_3", 1);
+        return expectedData.entrySet().stream().map(e -> {
+            NumberOfBooksByAuthor mockEntity = Mockito.mock(NumberOfBooksByAuthor.class);
+            Mockito.when(mockEntity.getAuthorFullName()).thenReturn(e.getKey());
+            Mockito.when(mockEntity.getNumber()).thenReturn(e.getValue());
+            return mockEntity;
+        }).toList();
+    }
+
 }

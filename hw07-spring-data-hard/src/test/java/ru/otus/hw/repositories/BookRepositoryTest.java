@@ -26,26 +26,43 @@ class BookRepositoryTest {
     @Autowired
     private TestEntityManager em;
 
-    @DisplayName("должен загружать книгу по id")
+    @DisplayName("should delete book by id")
     @ParameterizedTest
     @MethodSource("getDbBooks")
-    void shouldReturnCorrectBookById(Book expectedBook) {
-        assertThat(repository.findById(expectedBook.getId()))
-                .isPresent().get().isEqualTo(expectedBook);
+    void deleteByIdTestCase1(Book book) {
+        assertThat(em.find(Book.class, book.getId()))
+                .isNotNull()
+                .isEqualTo(book);
+        repository.deleteById(book.getId());
+        assertThat(em.find(Book.class, book.getId())).isNull();
     }
 
-    @DisplayName("должен загружать список всех книг")
+    @DisplayName("should return the correct list of books")
     @Test
-    void shouldReturnCorrectBooksList() {
+    void findAllTestCase1() {
         var actualBooks = repository.findAll();
         var expectedBooks = getDbBooks();
         assertThat(actualBooks).containsExactlyElementsOf(expectedBooks);
         actualBooks.forEach(System.out::println);
     }
 
-    @DisplayName("должен сохранять новую книгу")
+    @DisplayName("should return the correct book by id")
+    @ParameterizedTest
+    @MethodSource("getDbBooks")
+    void findByIdTestCase1(Book expectedBook) {
+        assertThat(repository.findById(expectedBook.getId()))
+                .isPresent().get().isEqualTo(expectedBook);
+    }
+
+    @DisplayName("should find the book with max id")
     @Test
-    void shouldSaveNewBook() {
+    void findWithMaxIdTestCase1() {
+        assertThat(repository.findWithMaxId()).isNotEmpty().map(b -> assertThat(b.getId()).isEqualTo(3));
+    }
+
+    @DisplayName("should save the new book correctly")
+    @Test
+    void saveTestCase1() {
         var expectedBook = new Book(0, "BookTitle_10500", em.find(Author.class, 1),
                 List.of(em.find(Genre.class, 1), em.find(Genre.class, 2)));
         var returnedBook = repository.save(expectedBook);
@@ -56,9 +73,9 @@ class BookRepositoryTest {
                 .isEqualTo(expectedBook);
     }
 
-    @DisplayName("должен сохранять измененную книгу")
+    @DisplayName("should update the existing book correctly")
     @Test
-    void shouldSaveUpdatedBook() {
+    void saveTestCase2() {
         var expectedBook = new Book(1L, "BookTitle_10500", em.find(Author.class, 2),
                 List.of(em.find(Genre.class, 4), em.find(Genre.class, 5)));
         assertThat(em.find(Book.class, expectedBook.getId()))
@@ -69,17 +86,6 @@ class BookRepositoryTest {
                 .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedBook);
         assertThat(em.find(Book.class, returnedBook.getId()))
                 .isEqualTo(expectedBook);
-    }
-
-    @DisplayName("должен удалять книгу по id ")
-    @ParameterizedTest
-    @MethodSource("getDbBooks")
-    void shouldDeleteBook(Book book) {
-        assertThat(em.find(Book.class, book.getId()))
-                .isNotNull()
-                .isEqualTo(book);
-        repository.deleteById(book.getId());
-        assertThat(em.find(Book.class, book.getId())).isNull();
     }
 
     private static List<Author> getDbAuthors() {

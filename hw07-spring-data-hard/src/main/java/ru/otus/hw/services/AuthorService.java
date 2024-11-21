@@ -7,16 +7,17 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AuthorService {
-    Report getNumberOfBooksByAuthors();
+
+    void deleteById(long id);
+
+    List<AuthorDto> findAll();
 
     Optional<AuthorDto> findById(long id);
 
-    List<AuthorDto> findAll();
+    Report getNumberOfBooksByAuthors();
 
     AuthorDto insert(String fullName);
 
     AuthorDto update(long id, String fullName);
-
-    void deleteById(long id);
 
 }

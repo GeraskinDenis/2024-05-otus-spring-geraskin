@@ -30,6 +30,26 @@ public class BookServiceImpl implements BookService {
 
     private final BookMapper bookMapper;
 
+    @Transactional
+    @Override
+    public void deleteById(long id) {
+        bookRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<BookDto> findAll() {
+        return bookRepository.findAll().stream()
+                .map(bookMapper::toDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<BookDto> findByAuthorFullNameLike(String authorFullNameSubstring) {
+        return bookRepository.findByAuthorFullNameLike("%" + authorFullNameSubstring + "%")
+                .stream().map(bookMapper::toDto).toList();
+    }
+
     @Transactional(readOnly = true)
     @Override
     public Optional<BookDto> findById(long id) {
@@ -42,22 +62,8 @@ public class BookServiceImpl implements BookService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<BookDto> findAll() {
-        return bookRepository.findAll().stream()
-                .map(bookMapper::toDto).toList();
-    }
-
-    @Transactional(readOnly = true)
-    @Override
     public List<BookDto> findByTitleLike(String titleSubstring) {
         return bookRepository.findByTitleLike("%" + titleSubstring + "%")
-                .stream().map(bookMapper::toDto).toList();
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<BookDto> findByAuthorFullNameLike(String authorFullNameSubstring) {
-        return bookRepository.findByAuthorFullNameLike("%" + authorFullNameSubstring + "%")
                 .stream().map(bookMapper::toDto).toList();
     }
 
@@ -73,31 +79,6 @@ public class BookServiceImpl implements BookService {
     public BookDto insert(String title, long authorId, Set<Long> genreIds) {
         return bookMapper.toDto(save(0, title, authorId, genreIds));
     }
-
-    @Transactional
-    @Override
-    public BookDto update(long id, String title, long authorId, Set<Long> genresIds) {
-        return bookMapper.toDto(save(id, title, authorId, genresIds));
-    }
-
-    @Transactional
-    @Override
-    public void deleteById(long id) {
-        bookRepository.deleteById(id);
-    }
-
-//    private List<List<String>> bookConvertToRow(List<Book> books) {
-//        List<List<String>> rows = new ArrayList<>(books.size());
-//        rows.add(List.of("№", "ID", "Title", "Author"));
-//        int i = 0;
-//        for (Book book : books) {
-//            rows.add(List.of(String.valueOf(++i),
-//                    String.valueOf(book.getId()),
-//                    String.valueOf(book.getTitle()),
-//                    String.valueOf(book.getAuthor().getFullName())));
-//        }
-//        return rows;
-//    }
 
     private Book save(long id, String title, long authorId, Set<Long> genreIds) {
         if (isEmpty(genreIds)) {
@@ -121,5 +102,11 @@ public class BookServiceImpl implements BookService {
             book.setGenres(genres);
         }
         return bookRepository.save(book);
+    }
+
+    @Transactional
+    @Override
+    public BookDto update(long id, String title, long authorId, Set<Long> genresIds) {
+        return bookMapper.toDto(save(id, title, authorId, genresIds));
     }
 }

@@ -8,7 +8,7 @@ import ru.otus.hw.dto.Report;
 import ru.otus.hw.mappers.AuthorMapper;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.repositories.AuthorRepository;
-import ru.otus.hw.repositories.projections.NumberOfBooksByAuthors;
+import ru.otus.hw.repositories.projections.NumberOfBooksByAuthor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public Report getNumberOfBooksByAuthors() {
         String reportName = "--- The number of books by authors ---";
-        List<NumberOfBooksByAuthors> dataList = authorRepository.getNumberOfBooksByAuthors();
+        List<NumberOfBooksByAuthor> dataList = authorRepository.getNumberOfBooksByAuthors();
         return new Report(reportName, convertToRows(dataList));
     }
 
@@ -65,11 +65,11 @@ public class AuthorServiceImpl implements AuthorService {
         authorRepository.deleteById(id);
     }
 
-    private List<List<String>> convertToRows(List<NumberOfBooksByAuthors> dataList) {
+    private List<List<String>> convertToRows(List<NumberOfBooksByAuthor> dataList) {
         List<List<String>> rows = new ArrayList<>(dataList.size());
         rows.add(List.of("Author", "Number"));
-        for (NumberOfBooksByAuthors data : dataList) {
-            rows.add(List.of(data.getFullName(), data.getNumber().toString()));
+        for (NumberOfBooksByAuthor data : dataList) {
+            rows.add(List.of(data.getAuthorFullName(), data.getNumber().toString()));
         }
         return rows;
     }

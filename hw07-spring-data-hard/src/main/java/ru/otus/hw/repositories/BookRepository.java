@@ -9,9 +9,16 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookRepository extends ListCrudRepository<Book, Long> {
+
     @Override
     @EntityGraph(attributePaths = {"author"})
     List<Book> findAll();
+
+    @EntityGraph(attributePaths = {"author"})
+    Optional<Book> findById(long id);
+
+    @EntityGraph(attributePaths = {"author"})
+    List<Book> findByAuthorFullNameLike(String authorFullNameSubstring);
 
     @Query(value = """
             SELECT
@@ -21,12 +28,6 @@ public interface BookRepository extends ListCrudRepository<Book, Long> {
             LIMIT 1
             """)
     Optional<Book> findWithMaxId();
-
-    @EntityGraph(attributePaths = {"author"})
-    Optional<Book> findById(long id);
-
-    @EntityGraph(attributePaths = {"author"})
-    List<Book> findByAuthorFullNameLike(String authorFullNameSubstring);
 
     @EntityGraph(attributePaths = {"author"})
     List<Book> findByTitleLike(String titleSubstring);

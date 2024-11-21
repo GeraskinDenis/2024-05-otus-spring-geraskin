@@ -33,7 +33,8 @@ public class BookCommands {
     }
 
     @ShellMethod(value = "Find books by title", key = "book-find-by-title")
-    public String findByTitle(@ShellOption(value = "titleSubstring", help = "substring of book title for search") String titleSubstring) {
+    public String findByTitle(@ShellOption(value = "titleSubstring",
+            help = "substring of book title for search") String titleSubstring) {
         return bookService.findByTitleLike(titleSubstring).stream()
                 .map(bookConverter::bookToString)
                 .collect(Collectors.joining(System.lineSeparator()));

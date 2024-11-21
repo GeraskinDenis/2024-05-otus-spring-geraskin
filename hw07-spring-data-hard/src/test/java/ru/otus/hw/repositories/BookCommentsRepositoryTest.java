@@ -1,6 +1,7 @@
 package ru.otus.hw.repositories;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,9 @@ import ru.otus.hw.models.BookComment;
 import ru.otus.hw.models.Genre;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -105,6 +108,13 @@ class BookCommentsRepositoryTest {
                 .matches(List::isEmpty);
     }
 
+    @DisplayName("should return the correct number of book comments by book id")
+    @Test
+    void countByBookIdTestCase1() {
+        getNumberBookCommentsByBookId().forEach((key, value) ->
+                assertThat(repository.countByBookId(key)).isEqualTo(value));
+    }
+
     private static List<BookComment> getDbBookComments() {
         List<Author> dbAuthors = getDbAuthors();
         List<Genre> dbGenres = getDbGenres();
@@ -154,6 +164,15 @@ class BookCommentsRepositoryTest {
             book.setComments(list);
         }
         return bookComments;
+    }
+
+    private static Map<Long, Integer> getNumberBookCommentsByBookId() {
+        Map<Long, Integer> numberBookCommentsByBookId = new HashMap<>(3);
+        numberBookCommentsByBookId.put(1L, 3);
+        numberBookCommentsByBookId.put(2L, 3);
+        numberBookCommentsByBookId.put(3L, 3);
+        numberBookCommentsByBookId.put(4L, 0);
+        return numberBookCommentsByBookId;
     }
 
     private static List<Long> getBookIds() {
