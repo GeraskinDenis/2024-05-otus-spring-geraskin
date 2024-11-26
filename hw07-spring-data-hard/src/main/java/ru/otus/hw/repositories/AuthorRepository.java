@@ -13,7 +13,7 @@ public interface AuthorRepository extends ListCrudRepository<Author, Long> {
                 a.fullName AS authorFullName,
                 count(b.author) AS number
             FROM Author AS a
-            JOIN FETCH Book AS b ON a = b.author
+            JOIN Book AS b ON a = b.author
             GROUP BY a.fullName""")
     List<NumberOfBooksByAuthor> getNumberOfBooksByAuthors();
 }
