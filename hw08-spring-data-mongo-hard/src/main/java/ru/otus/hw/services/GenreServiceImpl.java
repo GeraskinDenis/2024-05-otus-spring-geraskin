@@ -20,7 +20,7 @@ public class GenreServiceImpl implements GenreService {
     private final GenreMapper genreMapper;
 
     @Override
-    public Optional<GenreDto> findById(long id) {
+    public Optional<GenreDto> findById(String id) {
         Optional<Genre> genre = genreRepository.findById(id);
         if (genre.isPresent()) {
             return genre.map(genreMapper::toDto);
@@ -36,20 +36,20 @@ public class GenreServiceImpl implements GenreService {
     @Transactional
     @Override
     public GenreDto insert(String name) {
-        Genre genre = new Genre(0, name);
+        Genre genre = new Genre(null, name);
         return genreMapper.toDto(genreRepository.save(genre));
     }
 
     @Transactional
     @Override
-    public GenreDto update(long id, String name) {
+    public GenreDto update(String id, String name) {
         Genre genre = new Genre(id, name);
         return genreMapper.toDto(genreRepository.save(genre));
     }
 
     @Transactional
     @Override
-    public void deleteById(long id) {
+    public void deleteById(String id) {
         genreRepository.deleteById(id);
     }
 }

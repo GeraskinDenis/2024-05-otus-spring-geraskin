@@ -26,7 +26,7 @@ public class BookCommands {
     }
 
     @ShellMethod(value = "Find book by id", key = "bf")
-    public String findById(@ShellOption(value = "id", help = "book ID for search") long id) {
+    public String findById(@ShellOption(value = "id", help = "book ID for search") String id) {
         return bookService.findById(id)
                 .map(bookConverter::bookToString)
                 .orElse("Book not found by ID (%s)".formatted(id));
@@ -57,16 +57,16 @@ public class BookCommands {
 
     @ShellMethod(value = "Insert a new book", key = "bi")
     public String insert(@ShellOption(value = "title", help = "title of new book") String title,
-                         @ShellOption(value = "authorId", help = "author ID") long authorId,
+                         @ShellOption(value = "authorId", help = "author ID") String authorId,
                          @ShellOption(value = "genereIds", help = "list of genre ids (example: \"1,2,3\")")
                          Set<Long> genreIds) {
         return bookConverter.bookToString(bookService.insert(title, authorId, genreIds));
     }
 
     @ShellMethod(value = "Update book", key = "bu")
-    public String update(@ShellOption(value = "id", help = "book id") long id,
+    public String update(@ShellOption(value = "id", help = "book id") String id,
                          @ShellOption(value = "title", help = "title of new book") String title,
-                         @ShellOption(value = "authorId", help = "author ID") long authorId,
+                         @ShellOption(value = "authorId", help = "author ID") String authorId,
                          @ShellOption(value = "genereIds", help = "list of genre ids (example: \"1,2,3\")")
                          Set<Long> genreIds) {
         var savedBook = bookService.update(id, title, authorId, genreIds);
@@ -74,7 +74,7 @@ public class BookCommands {
     }
 
     @ShellMethod(value = "Delete book by id", key = "bd")
-    public String delete(@ShellOption(value = "id", help = "book id for delete") long id) {
+    public String delete(@ShellOption(value = "id", help = "book id for delete") String id) {
         bookService.deleteById(id);
         return "Deletion Book by ID (%s) completed.".formatted(id);
     }

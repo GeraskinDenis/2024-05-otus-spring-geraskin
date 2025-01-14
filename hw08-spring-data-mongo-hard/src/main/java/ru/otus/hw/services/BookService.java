@@ -8,19 +8,19 @@ import java.util.Set;
 
 public interface BookService {
 
-    void deleteById(long id);
+    void deleteById(String id);
 
     List<BookDto> findAll();
 
     List<BookDto> findByAuthorFullNameLike(String authorFullNameSubstring);
 
-    Optional<BookDto> findById(long id);
+    Optional<BookDto> findById(String id);
 
     List<BookDto> findByTitleLike(String title);
 
     Optional<BookDto> findWithMaxId();
 
-    BookDto insert(String title, long authorId, Set<Long> genreIds);
+    BookDto insert(String title, String authorId, Set<Long> genreIds);
 
-    BookDto update(long id, String title, long authorId, Set<Long> genresIds);
+    BookDto update(String id, String title, String authorId, Set<Long> genresIds);
 }

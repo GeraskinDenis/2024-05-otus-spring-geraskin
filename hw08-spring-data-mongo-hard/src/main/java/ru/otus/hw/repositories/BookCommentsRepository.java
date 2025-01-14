@@ -6,11 +6,11 @@ import ru.otus.hw.models.BookComment;
 
 import java.util.List;
 
-public interface BookCommentsRepository extends ListCrudRepository<BookComment, Long> {
+public interface BookCommentsRepository extends ListCrudRepository<BookComment, String> {
 
-    int countByBookId(Long bookId);
+    int countByBookId(String bookId);
 
-    void deleteByBookId(Long bookId);
+    void deleteByBookId(String bookId);
 
     List<BookComment> findByBook(Book book);
 }

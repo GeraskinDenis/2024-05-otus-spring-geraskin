@@ -6,6 +6,6 @@ import ru.otus.hw.dto.GenreDto;
 @Component
 public class GenreConverter {
     public String genreToString(GenreDto genreDto) {
-        return "Id: %d, Name: %s".formatted(genreDto.id(), genreDto.name());
+        return "Id: %s, Name: %s".formatted(genreDto.id(), genreDto.name());
     }
 }

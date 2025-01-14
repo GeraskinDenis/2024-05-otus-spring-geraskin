@@ -8,16 +8,16 @@ import java.util.Optional;
 
 public interface AuthorService {
 
-    void deleteById(long id);
+    void deleteById(String id);
 
     List<AuthorDto> findAll();
 
-    Optional<AuthorDto> findById(long id);
+    Optional<AuthorDto> findById(String id);
 
     Report getNumberOfBooksByAuthors();
 
     AuthorDto insert(String fullName);
 
-    AuthorDto update(long id, String fullName);
+    AuthorDto update(String id, String fullName);
 
 }

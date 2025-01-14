@@ -27,25 +27,25 @@ public class BookCommentServiceImpl implements BookCommentService {
     private final BookRepository bookRepository;
 
     @Override
-    public Integer getNumberByBookId(Long id) {
+    public Integer getNumberByBookId(String id) {
         return bookCommentsRepository.countByBookId(id);
     }
 
     @Transactional
     @Override
-    public void deleteAllByBookId(long bookId) {
+    public void deleteAllByBookId(String bookId) {
         bookCommentsRepository.deleteByBookId(bookId);
     }
 
     @Transactional
     @Override
-    public void deleteById(long bookCommentId) {
+    public void deleteById(String bookCommentId) {
         bookCommentsRepository.deleteById(bookCommentId);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<BookCommentDto> findById(long id) {
+    public Optional<BookCommentDto> findById(String id) {
         Optional<BookComment> bookComment = bookCommentsRepository.findById(id);
         if (bookComment.isPresent()) {
             return bookComment.map(bookCommentMapper::toDto);
@@ -55,7 +55,7 @@ public class BookCommentServiceImpl implements BookCommentService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<BookCommentDto> findByBook(long bookId) {
+    public List<BookCommentDto> findByBook(String bookId) {
         Optional<Book> optionalBook = bookRepository.findById(bookId);
         return optionalBook.map(book -> bookCommentsRepository.findByBook(book)
                 .stream()
@@ -65,19 +65,19 @@ public class BookCommentServiceImpl implements BookCommentService {
 
     @Transactional
     @Override
-    public BookCommentDto insert(long bookId, String text) {
+    public BookCommentDto insert(String bookId, String text) {
         if (Objects.isNull(text) || text.isEmpty()) {
             throw new IllegalArgumentException("The comment text must not be empty.");
         }
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("Book not found by ID:" + bookId));
-        BookComment bookComment = bookCommentsRepository.save(new BookComment(0, book, text));
+        BookComment bookComment = bookCommentsRepository.save(new BookComment(null, book, text));
         return bookCommentMapper.toDto(bookComment);
     }
 
     @Transactional
     @Override
-    public BookCommentDto update(long id, long bookId, String text) {
+    public BookCommentDto update(String id, String bookId, String text) {
         if (Objects.isNull(text) || text.isEmpty()) {
             throw new IllegalArgumentException("The comment text must not be empty.");
         }
@@ -87,7 +87,7 @@ public class BookCommentServiceImpl implements BookCommentService {
         return bookCommentMapper.toDto(bookComment);
     }
 
-    private Book getExistingBookById(Long bookId) {
+    private Book getExistingBookById(String bookId) {
         return bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("Book not found by ID: " + bookId));
     }

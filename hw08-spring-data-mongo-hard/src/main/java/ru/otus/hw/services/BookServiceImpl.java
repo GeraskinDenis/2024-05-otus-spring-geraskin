@@ -12,6 +12,7 @@ import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.GenreRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,7 +33,7 @@ public class BookServiceImpl implements BookService {
 
     @Transactional
     @Override
-    public void deleteById(long id) {
+    public void deleteById(String id) {
         bookRepository.deleteById(id);
     }
 
@@ -52,7 +53,7 @@ public class BookServiceImpl implements BookService {
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<BookDto> findById(long id) {
+    public Optional<BookDto> findById(String id) {
         Optional<Book> book = bookRepository.findById(id);
         if (book.isPresent()) {
             return book.map(bookMapper::toDto);
@@ -76,27 +77,27 @@ public class BookServiceImpl implements BookService {
 
     @Transactional
     @Override
-    public BookDto insert(String title, long authorId, Set<Long> genreIds) {
-        return bookMapper.toDto(save(0, title, authorId, genreIds));
+    public BookDto insert(String title, String authorId, Set<Long> genreIds) {
+        return bookMapper.toDto(save(null, title, authorId, genreIds));
     }
 
-    private Book save(long id, String title, long authorId, Set<Long> genreIds) {
+    private Book save(String id, String title, String authorId, Set<Long> genreIds) {
         if (isEmpty(genreIds)) {
             throw new IllegalArgumentException("Genres ids must not be null");
         }
         var author = authorRepository.findById(authorId)
-                .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(authorId)));
+                .orElseThrow(() -> new EntityNotFoundException("Author with id '%s' not found".formatted(authorId)));
         var genres = genreRepository.findByIdIn(genreIds);
         if (isEmpty(genres) || genreIds.size() != genres.size()) {
             String genreIdsStr = genreIds.stream().map(String::valueOf).collect(Collectors.joining(", "));
             throw new EntityNotFoundException("One or more genres with ids [%s] not found".formatted(genreIdsStr));
         }
         Book book;
-        if (id == 0) {
+        if (Objects.isNull(id)) {
             book = new Book(id, title, author, genres);
         } else {
             book = bookRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(id)));
+                    .orElseThrow(() -> new EntityNotFoundException("Book with id '%s' not found".formatted(id)));
             book.setTitle(title);
             book.setAuthor(author);
             book.setGenres(genres);
@@ -106,7 +107,7 @@ public class BookServiceImpl implements BookService {
 
     @Transactional
     @Override
-    public BookDto update(long id, String title, long authorId, Set<Long> genresIds) {
+    public BookDto update(String id, String title, String authorId, Set<Long> genresIds) {
         return bookMapper.toDto(save(id, title, authorId, genresIds));
     }
 }

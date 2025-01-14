@@ -7,17 +7,17 @@ import java.util.Optional;
 
 public interface BookCommentService {
 
-    void deleteAllByBookId(long bookId);
+    void deleteAllByBookId(String bookId);
 
-    void deleteById(long bookCommentId);
+    void deleteById(String bookCommentId);
 
-    List<BookCommentDto> findByBook(long id);
+    List<BookCommentDto> findByBook(String id);
 
-    Optional<BookCommentDto> findById(long id);
+    Optional<BookCommentDto> findById(String id);
 
-    Integer getNumberByBookId(Long id);
+    Integer getNumberByBookId(String id);
 
-    BookCommentDto insert(long bookId, String text);
+    BookCommentDto insert(String bookId, String text);
 
-    BookCommentDto update(long id, long bookId, String text);
+    BookCommentDto update(String id, String bookId, String text);
 }

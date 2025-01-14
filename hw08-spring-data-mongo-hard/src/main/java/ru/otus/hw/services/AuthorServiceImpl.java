@@ -23,7 +23,7 @@ public class AuthorServiceImpl implements AuthorService {
     private final AuthorMapper authorMapper;
 
     @Override
-    public Optional<AuthorDto> findById(long id) {
+    public Optional<AuthorDto> findById(String id) {
         Optional<Author> author = authorRepository.findById(id);
         if (author.isPresent()) {
             return author.map(authorMapper::toDto);
@@ -46,14 +46,14 @@ public class AuthorServiceImpl implements AuthorService {
     @Transactional
     @Override
     public AuthorDto insert(String fullName) {
-        Author author = new Author(0, fullName);
+        Author author = new Author(null, fullName);
         author = authorRepository.save(author);
         return authorMapper.toDto(author);
     }
 
     @Transactional
     @Override
-    public AuthorDto update(long id, String fullName) {
+    public AuthorDto update(String id, String fullName) {
         Author author = new Author(id, fullName);
         author = authorRepository.save(author);
         return authorMapper.toDto(author);
@@ -61,7 +61,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Transactional
     @Override
-    public void deleteById(long id) {
+    public void deleteById(String id) {
         authorRepository.deleteById(id);
     }
 
