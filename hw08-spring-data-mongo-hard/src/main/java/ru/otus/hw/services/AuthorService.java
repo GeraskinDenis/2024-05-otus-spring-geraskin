@@ -1,7 +1,6 @@
 package ru.otus.hw.services;
 
-import ru.otus.hw.dto.AuthorDto;
-import ru.otus.hw.dto.Report;
+import ru.otus.hw.models.Author;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,14 +9,13 @@ public interface AuthorService {
 
     void deleteById(String id);
 
-    List<AuthorDto> findAll();
+    List<Author> findAll();
 
-    Optional<AuthorDto> findById(String id);
+    Optional<Author> findById(String id);
 
-    Report getNumberOfBooksByAuthors();
+    Author findByIdOrThrow(String id);
 
-    AuthorDto insert(String fullName);
+    Author insert(String fullName);
 
-    AuthorDto update(String id, String fullName);
-
+    Author update(String id, String fullName);
 }

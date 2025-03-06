@@ -1,0 +1,20 @@
+spring:
+  main:
+    allow-circular-references: true
+  data:
+    mongodb:
+      #      uri: mongodb://localhost:27017/otus_books # TODO
+      uri: mongodb://localhost:27017/zzz
+      auto-index-creation: true
+mongock:
+  migration-scan-package:
+    - ru.otus.hw.migration
+#  transaction-enabled: false
+#  enabled: true
+#  runner-type: InitializingBean
+#  runner-type: ApplicationRunner
+##  transactional: true
+#  mongo-db:
+#    write-concern:
+#      journal: false
+#    read-concern: local

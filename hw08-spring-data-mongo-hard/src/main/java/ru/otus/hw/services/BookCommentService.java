@@ -1,23 +1,25 @@
 package ru.otus.hw.services;
 
-import ru.otus.hw.dto.BookCommentDto;
+import ru.otus.hw.models.BookComment;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface BookCommentService {
 
-    void deleteAllByBookId(String bookId);
+    Integer countByBookId(String bookId);
 
-    void deleteById(String bookCommentId);
+    void deleteAllByBook(String bookId);
 
-    List<BookCommentDto> findByBook(String id);
+    void deleteById(String id);
 
-    Optional<BookCommentDto> findById(String id);
+    List<BookComment> findByBookId(String bookId);
 
-    Integer getNumberByBookId(String id);
+    Optional<BookComment> findById(String id);
 
-    BookCommentDto insert(String bookId, String text);
+    BookComment findByIdOrThrow(String id);
 
-    BookCommentDto update(String id, String bookId, String text);
+    BookComment insert(String bookId, String text);
+
+    BookComment update(String id, String bookId, String text);
 }

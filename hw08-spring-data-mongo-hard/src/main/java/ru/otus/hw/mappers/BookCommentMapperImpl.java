@@ -9,6 +9,9 @@ public class BookCommentMapperImpl implements BookCommentMapper {
 
     @Override
     public BookCommentDto toDto(BookComment bookComment) {
-        return new BookCommentDto(bookComment.getId(), bookComment.getBook().getId(), bookComment.getText());
+        return new BookCommentDto(bookComment.getId(),
+                bookComment.getUuid(),
+                bookComment.getBook().getId(),
+                bookComment.getText());
     }
 }

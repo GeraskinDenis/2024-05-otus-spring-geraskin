@@ -17,6 +17,7 @@ public class BookMapperImpl implements BookMapper {
     public BookDto toDto(Book book) {
         return new BookDto(
                 book.getId(),
+                book.getUuid(),
                 book.getTitle(),
                 authorMapper.toDto(book.getAuthor()),
                 book.getGenres().stream().map(genreMapper::toDto).toList());

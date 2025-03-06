@@ -1,28 +1,39 @@
 package ru.otus.hw.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection = "book_comments")
-@Data
-@AllArgsConstructor
+@Document
 @NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class BookComment {
 
     @Id
+    @EqualsAndHashCode.Exclude
     private String id;
 
-    @Field(name = "book")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
+    @Indexed(unique = true)
+    private String uuid;
+
+    @DBRef
     private Book book;
 
-    @Field(name = "text")
     private String text;
+
+    public BookComment(String uuid, Book book, String text) {
+        this.uuid = uuid;
+        this.book = book;
+        this.text = text;
+    }
+
+    @Override
+    public String toString() {
+        return "BookComment{" +
+                "id='" + id + '\'' +
+                '}';
+    }
 }

@@ -12,5 +12,5 @@ public interface BookCommentsRepository extends ListCrudRepository<BookComment, 
 
     void deleteByBookId(String bookId);
 
-    List<BookComment> findByBook(Book book);
+    List<BookComment> findByBookId(String bookId);
 }

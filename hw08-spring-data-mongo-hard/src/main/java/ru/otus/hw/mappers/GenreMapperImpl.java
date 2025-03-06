@@ -8,6 +8,6 @@ import ru.otus.hw.models.Genre;
 public class GenreMapperImpl implements GenreMapper {
     @Override
     public GenreDto toDto(Genre genre) {
-        return new GenreDto(genre.getId(), genre.getName());
+        return new GenreDto(genre.getId(), genre.getUuid(), genre.getName());
     }
 }
