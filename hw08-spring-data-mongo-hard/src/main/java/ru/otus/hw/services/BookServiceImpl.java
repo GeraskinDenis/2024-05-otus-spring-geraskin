@@ -2,23 +2,24 @@ package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mappers.BookMapper;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.utils.CommonUtils;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
+
+    private final BookMapper bookMapper;
 
     private final AuthorService authorService;
 
@@ -36,7 +37,8 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<Book> findByAuthorFullNameSubstring(String fullNameSubstring) {
-        return bookRepository.findByAuthorFullNameLike("%" + fullNameSubstring + "%");
+        List<Author> authors = authorService.findByFullName(fullNameSubstring);
+        return bookRepository.findByAuthorIn(authors.stream().map(Author::getId).toList());
     }
 
     @Override
@@ -52,7 +54,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<Book> findByTitleSubstring(String titleSubstring) {
-        return bookRepository.findByTitleLike("%" + titleSubstring + "%");
+        return bookRepository.findByTitleLike(titleSubstring);
     }
 
     @Override
@@ -78,5 +80,10 @@ public class BookServiceImpl implements BookService {
             book.setGenres(genres);
         }
         return bookRepository.save(book);
+    }
+
+    @Override
+    public BookDto toDto(Book book) {
+        return bookMapper.toDto(book);
     }
 }

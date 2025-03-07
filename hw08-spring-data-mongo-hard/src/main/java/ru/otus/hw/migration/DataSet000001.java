@@ -8,10 +8,8 @@ import ru.otus.hw.models.BookComment;
 import ru.otus.hw.models.Genre;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @ChangeUnit(id = "dataset-000001", order = "000001", author = "Geraskin Denis")
@@ -56,6 +54,7 @@ public class DataSet000001 {
         mongoTemplate.remove(Author.class);
         mongoTemplate.remove(Genre.class);
         mongoTemplate.remove(Book.class);
+        mongoTemplate.remove(BookComment.class);
     }
 
     private Author getAuthor(int i) {

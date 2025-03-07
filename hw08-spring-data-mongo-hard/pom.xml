@@ -40,11 +40,11 @@
             <version>3.4.0</version>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.shell</groupId>-->
-        <!--            <artifactId>spring-shell-starter</artifactId>-->
-        <!--            <version>${spring.shell.version}</version>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.shell</groupId>
+            <artifactId>spring-shell-starter</artifactId>
+            <version>3.4.0</version>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -80,28 +80,28 @@
             <scope>test</scope>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.reflections</groupId>-->
-<!--            <artifactId>reflections</artifactId>-->
-<!--            <version>0.10.2</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.reflections</groupId>-->
+        <!--            <artifactId>reflections</artifactId>-->
+        <!--            <version>0.10.2</version>-->
+        <!--            <scope>test</scope>-->
+        <!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>de.flapdoodle.embed</groupId>-->
-<!--            <artifactId>de.flapdoodle.embed.mongo</artifactId>-->
-<!--            <version>4.18.1</version>-->
-<!--            &lt;!&ndash;            <version>${flapdoodle.version}</version>&ndash;&gt;-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>de.flapdoodle.embed</groupId>-->
+        <!--            <artifactId>de.flapdoodle.embed.mongo</artifactId>-->
+        <!--            <version>4.18.1</version>-->
+        <!--            &lt;!&ndash;            <version>${flapdoodle.version}</version>&ndash;&gt;-->
+        <!--            <scope>test</scope>-->
+        <!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>de.flapdoodle.embed</groupId>-->
-<!--            <artifactId>de.flapdoodle.embed.mongo.spring30x</artifactId>-->
-<!--            <version>4.11.0</version>-->
-<!--            &lt;!&ndash;            <version>${flapdoodle.version}</version>&ndash;&gt;-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>de.flapdoodle.embed</groupId>-->
+        <!--            <artifactId>de.flapdoodle.embed.mongo.spring30x</artifactId>-->
+        <!--            <version>4.11.0</version>-->
+        <!--            &lt;!&ndash;            <version>${flapdoodle.version}</version>&ndash;&gt;-->
+        <!--            <scope>test</scope>-->
+        <!--        </dependency>-->
 
     </dependencies>
 

@@ -2,7 +2,9 @@ package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.otus.hw.dto.BookCommentDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mappers.BookCommentMapper;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.BookComment;
 import ru.otus.hw.repositories.BookCommentsRepository;
@@ -19,13 +21,15 @@ public class BookCommentServiceImpl implements BookCommentService {
 
     private final BookService bookService;
 
+    private final BookCommentMapper bookCommentMapper;
+
     @Override
-    public Integer countByBookId(String bookId) {
+    public int countByBookId(String bookId) {
         return bookCommentsRepository.countByBookId(bookId);
     }
 
     @Override
-    public void deleteAllByBook(String bookId) {
+    public void deleteAllByBookId(String bookId) {
         bookCommentsRepository.deleteByBookId(bookId);
     }
 
@@ -55,6 +59,11 @@ public class BookCommentServiceImpl implements BookCommentService {
         Book book = bookService.findByIdOrThrow(bookId);
         BookComment bookComment = new BookComment(CommonUtils.getUUID(), book, text);
         return bookCommentsRepository.save(bookComment);
+    }
+
+    @Override
+    public BookCommentDto toDto(BookComment bookComment) {
+        return bookCommentMapper.toDto(bookComment);
     }
 
     @Override

@@ -1,13 +1,15 @@
 package ru.otus.hw.repositories;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import ru.otus.hw.models.Genre;
 
 import java.util.*;
@@ -15,100 +17,99 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Репозиторий на основе JPA для работы с 'Жанрами'")
-@DataJpaTest
+@DisplayName("The test set for 'Genre' repository")
+@SpringBootTest
 public class GenreRepositoryTest {
 
-    @Autowired
-    private GenreRepository repository;
+    private final GenreRepository repository;
+
+    private final MongoTemplate mongoTemplate;
 
     @Autowired
-    private TestEntityManager em;
-
-    @DisplayName("should delete Genre by 'id'")
-    @ParameterizedTest
-    @MethodSource("getDbGenres")
-    void deleteByIdTestCase1(Genre genre) {
-        assertThat(em.find(Genre.class, genre.getId()))
-                .isNotNull().isEqualTo(genre);
-        repository.deleteById(genre.getId());
-        assertThat(em.find(Genre.class, genre.getId())).isNull();
+    public GenreRepositoryTest(GenreRepository repository, MongoTemplate mongoTemplate) {
+        this.repository = repository;
+        this.mongoTemplate = mongoTemplate;
     }
 
-    @DisplayName("should return the correct list of Genres")
+    @BeforeEach
+    public void beforeEach() {
+        mongoTemplate.remove(new Query(), Genre.class);
+        assertThat(0).isEqualTo(mongoTemplate.count(new Query(), Genre.class));
+        mongoTemplate.insert(getGenres(), Genre.class);
+    }
+
+    @AfterEach
+    public void afterEach() {
+        mongoTemplate.remove(new Query(), Genre.class);
+    }
+
+
+    @DisplayName("should delete 'Genre' by id")
+    @ParameterizedTest
+    @MethodSource("getGenres")
+    void deleteByIdTestCase1(Genre genre) {
+        assertThat(mongoTemplate.findById(genre.getId(), Genre.class)).isEqualTo(genre);
+        repository.deleteById(genre.getId());
+        assertThat(mongoTemplate.findById(genre.getId(), Genre.class)).isNull();
+    }
+
+    @DisplayName("should find all 'Genres'")
     @Test
     void findAllTestCase1() {
+        List<Genre> expected = getGenres();
         List<Genre> actual = repository.findAll();
-        List<Genre> expected = getDbGenres();
         assertThat(actual).containsExactlyElementsOf(expected);
     }
 
-    @DisplayName("should return the correct Genre by 'id'")
+    @DisplayName("should find 'Genre' by id")
     @ParameterizedTest
-    @MethodSource("getDbGenres")
+    @MethodSource("getGenres")
     void findByIdTestCase1(Genre expected) {
         Optional<Genre> actual = repository.findById(expected.getId());
         assertThat(actual).isPresent().get().isEqualTo(expected);
     }
 
-    @DisplayName("should not find the Genre by 'id'")
+    @DisplayName("should find no 'Genre' by id")
     @Test
     void findByIdTestCase2() {
-        Optional<Genre> actual = repository.findById(10L);
+        Optional<Genre> actual = repository.findById("genre_id_dummy");
         assertThat(actual).isEmpty();
     }
 
-    @DisplayName("should get correctly the number of books by genres")
-    @Test
-    void getNumberOfBooksByGenreTestCase1() {
-        List<Map<String, Object>> expected = getNumberOfBooksByGenre();
-        List<Map<String, Object>> actual = repository.getNumberOfBooksByGenre();
-        assertThat(actual.size()).isEqualTo(expected.size());
-        assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
+    @DisplayName("should find 'Genre' by name substring")
+    @ParameterizedTest
+    @MethodSource("getGenres")
+    void findByNameLikeTestCase1(Genre expected) {
+        assertThat(repository.findByNameLike(expected.getName())).contains(expected);
     }
 
-    @DisplayName("should save a new Genre correctly")
+    @DisplayName("should find all 'Genre' by name substring")
+    @Test
+    void findByNameLikeTestCase2() {
+        assertThat(repository.findByNameLike("genre_name_")).containsExactlyElementsOf(getGenres());
+    }
+
+    @DisplayName("should save a new 'Genre' correctly")
     @Test
     void saveTestCase1() {
-        Genre expected = repository.save(new Genre(0, "TestGenre"));
-        assertThat(expected).isNotNull()
-                .matches(e -> e.getId() > 0)
-                .matches(e -> Objects.nonNull(e.getName()))
-                .matches(e -> !e.getName().isEmpty());
-        Genre actual = em.find(Genre.class, expected.getId());
-        assertThat(actual)
-                .isNotNull()
-                .isEqualTo(expected);
+        Genre expected = repository.save(new Genre("genre_id_test", "genre_uuid_test", "genre_name_test"));
+        assertThat(expected).isEqualTo(mongoTemplate.findById(expected.getId(), Genre.class));
     }
 
-    @DisplayName("should update a Genre correctly")
+    @DisplayName("should update a 'Genre' correctly")
     @ParameterizedTest
-    @MethodSource("getDbGenres")
+    @MethodSource("getGenres")
     void saveTestCase2(Genre genre) {
-        Genre actual = em.find(Genre.class, genre.getId());
-        assertThat(actual).isNotNull().isEqualTo(genre);
-        actual.setName("NewNameTest");
-        actual = repository.save(actual);
-        assertThat(actual).isNotNull()
-                .isNotEqualTo(genre);
-        assertThat(em.find(Genre.class, genre.getId()))
-                .isNotNull().isEqualTo(actual);
+        Genre expected = mongoTemplate.findById(genre.getId(), Genre.class);
+        assertThat(expected).isNotNull();
+        expected = new Genre(expected.getId(), expected.getUuid(), "genre_new_name_test");
+        expected = repository.save(expected);
+        assertThat(mongoTemplate.findById(expected.getId(), Genre.class)).isEqualTo(expected);
     }
 
-    private static List<Genre> getDbGenres() {
-        return IntStream.range(1, 7).boxed()
-                .map(id -> new Genre(id, "Genre_" + id)).toList();
-    }
-
-    private static List<Map<String, Object>> getNumberOfBooksByGenre() {
-        List<Map<String, Object>> expected = new ArrayList<>();
-        for (int i = 1; i < 7; i++) {
-            Map<String, Object> row = new HashMap<>(3);
-            row.put("ID", (long) i);
-            row.put("NAME", "Genre_" + i);
-            row.put("NUMBER", 1L);
-            expected.add(row);
-        }
-        return expected;
+    private static List<Genre> getGenres() {
+        return IntStream.range(0, 5).boxed()
+                .map(id -> new Genre("genre_id_" + id, "genre_uuid_" + id, "genre_name_" + id))
+                .toList();
     }
 }

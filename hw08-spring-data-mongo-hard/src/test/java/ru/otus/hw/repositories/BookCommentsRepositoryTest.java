@@ -1,12 +1,15 @@
 package ru.otus.hw.repositories;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.BookComment;
@@ -20,162 +23,156 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Репозиторий на основе JPA для работы с комментариями книг ")
-@DataJpaTest
-//@Import({BookCommentsRepository.class})
+@DisplayName("Test set for 'BookComment' repository")
+@SpringBootTest
 class BookCommentsRepositoryTest {
 
-    @Autowired
-    private BookCommentsRepository repository;
+    private final MongoTemplate mongoTemplate;
+
+    private final BookCommentsRepository repository;
 
     @Autowired
-    private TestEntityManager em;
+    public BookCommentsRepositoryTest(MongoTemplate mongoTemplate, BookCommentsRepository repository) {
+        this.mongoTemplate = mongoTemplate;
+        this.repository = repository;
+    }
 
-    @DisplayName("должен загружать комментарий к книге по id")
+    @BeforeEach
+    public void beforeEach() {
+        mongoTemplate.remove(new Query(), BookComment.class);
+        assertThat(0).isEqualTo(mongoTemplate.count(new Query(), BookComment.class));
+        mongoTemplate.remove(new Query(), Book.class);
+        assertThat(0).isEqualTo(mongoTemplate.count(new Query(), Book.class));
+        mongoTemplate.remove(new Query(), Author.class);
+        assertThat(0).isEqualTo(mongoTemplate.count(new Query(), Author.class));
+        mongoTemplate.remove(new Query(), Genre.class);
+        assertThat(0).isEqualTo(mongoTemplate.count(new Query(), Genre.class));
+        mongoTemplate.insert(getAuthors(), Author.class);
+        mongoTemplate.insert(getGenres(), Genre.class);
+        mongoTemplate.insert(getBooks(), Book.class);
+        mongoTemplate.insert(getBookComments(), BookComment.class);
+    }
+
+    @AfterEach
+    public void afterEach() {
+        mongoTemplate.remove(new Query(), BookComment.class);
+        mongoTemplate.remove(new Query(), Book.class);
+        mongoTemplate.remove(new Query(), Author.class);
+        mongoTemplate.remove(new Query(), Genre.class);
+    }
+
+    @DisplayName("should find book comment by book id correctly")
     @ParameterizedTest
-    @MethodSource("getDbBookComments")
-    void shouldReturnCorrectBookById(BookComment expectedBookComment) {
-        var actualBookComment = repository.findById(expectedBookComment.getId());
-        assertThat(actualBookComment).isPresent().get()
-                .isEqualTo(expectedBookComment);
+    @MethodSource("getBookComments")
+    void findByIdTestCase1(BookComment expected) {
+        var actual = repository.findById(expected.getId());
+        assertThat(actual).isPresent().get()
+                .isEqualTo(expected);
     }
 
 
-    @DisplayName("должен загружать список всех комментариев к ID книге")
+    @DisplayName("should find all 'BookComments' by book id")
     @ParameterizedTest
-    @MethodSource("getDbBooks")
-    void shouldReturnCorrectBookCommentsListByBookId(Book book) {
-        var actualBookComments = repository.findByBook(book);
-        var expectedBookComments = book.getComments();
-        assertThat(actualBookComments).containsExactlyElementsOf(expectedBookComments);
-        actualBookComments.forEach(System.out::println);
+    @MethodSource("getBooks")
+    void findByBookIdTestCase1(Book book) {
+        var expected = getBookComments().stream()
+                .filter(bc -> bc.getBook().equals(book)).toList();
+        var actual = repository.findByBookId(book.getId());
+        assertThat(actual).containsExactlyElementsOf(expected);
     }
 
-    @DisplayName("должен сохранять новый комментарий")
+    @DisplayName("should save a new 'BookComment correctly")
     @ParameterizedTest
-    @MethodSource("getDbBooks")
+    @MethodSource("getBooks")
     void shouldSaveNew(Book book) {
-        var expectedBookComment = new BookComment(0, book, "Book_%s_test_comment".formatted(book.getId()));
-        var returnedBookComment = repository.save(expectedBookComment);
-        assertThat(returnedBookComment).isNotNull()
-                .matches(c -> c.getId() > 0)
-                .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedBookComment);
-        assertThat(em.find(BookComment.class, returnedBookComment.getId()))
-                .isEqualTo(returnedBookComment);
+        var expected = new BookComment("book_comment_id_test", "book_comment_uuid_test",
+                book, "book_comment_text_test");
+        expected = repository.save(expected);
+        assertThat(mongoTemplate.findById(expected.getId(), BookComment.class)).isEqualTo(expected);
     }
 
-    @DisplayName("должен сохранять измененный комментарий")
+    @DisplayName("should update book comment correctly")
     @ParameterizedTest
-    @MethodSource("getDbBookComments")
-    void shouldSaveUpdatedBookComment(BookComment bookComment) {
-        BookComment expectedBookComment = em.find(BookComment.class, bookComment.getId());
-        BookComment actualBookComment = em.find(BookComment.class, expectedBookComment.getId());
-        assertThat(actualBookComment).isEqualTo(expectedBookComment);
-        expectedBookComment.setText("New comment text");
-        var returnedBookComment = repository.save(expectedBookComment);
-        assertThat(returnedBookComment).isNotNull()
-                .matches(c -> c.getId() > 0)
-                .usingRecursiveComparison()
-                .ignoringExpectedNullFields()
-                .isEqualTo(expectedBookComment);
-        assertThat(em.find(BookComment.class, returnedBookComment.getId()))
-                .isEqualTo(expectedBookComment);
+    @MethodSource("getBookComments")
+    void shouldSaveUpdatedBookComment(BookComment expected) {
+        expected = mongoTemplate.findById(expected.getId(), BookComment.class);
+        assertThat(expected).isNotNull();
+        expected = new BookComment(expected.getId(), expected.getUuid(), expected.getBook(),
+                "book_comment_new_text");
+        expected = repository.save(expected);
+        var actual = mongoTemplate.findById(expected.getId(), BookComment.class);
+        assertThat(actual).isEqualTo(expected);
     }
 
-    @DisplayName("должен удалить комментарий по ID")
+    @DisplayName("should remove book comment by id")
     @ParameterizedTest
-    @MethodSource("getDbBookComments")
-    void shouldDeleteBookCommentById(BookComment bookComment) {
-        assertThat(em.find(BookComment.class, bookComment.getId())).isNotNull().isEqualTo(bookComment);
+    @MethodSource("getBookComments")
+    void deleteByIdTestCase1(BookComment bookComment) {
+        assertThat(mongoTemplate.findById(bookComment.getId(), BookComment.class)).isEqualTo(bookComment);
         repository.deleteById(bookComment.getId());
-        assertThat(em.find(BookComment.class, bookComment.getId())).isNull();
+        assertThat(mongoTemplate.findById(bookComment.getId(), BookComment.class)).isNull();
     }
 
-    @DisplayName("должен удалять все комментарии по ID книги")
+    @DisplayName("should remove all book comment by book id")
     @ParameterizedTest
-    @MethodSource("getBookIds")
-    void shouldDeleteAllBookCommentsByBookId(long bookId) {
-        Book actualBook = em.find(Book.class, bookId);
-        List<BookComment> actualBookComments = actualBook.getComments();
-        assertThat(actualBookComments).isNotNull()
-                .matches(list -> !list.isEmpty());
-        repository.deleteByBookId(bookId);
-        em.flush();
-        em.detach(actualBook);
-        actualBook = em.find(Book.class, bookId);
-        actualBookComments = actualBook.getComments();
-        assertThat(actualBookComments).isNotNull()
-                .matches(List::isEmpty);
+    @MethodSource("getBooks")
+    void deleteByBookIdTestCase1(Book book) {
+        List<BookComment> actual = mongoTemplate.find(new Query(), BookComment.class).stream()
+                .filter(bc -> bc.getBook().equals(book)).toList();
+        assertThat(actual).isNotEmpty();
+        repository.deleteByBookId(book.getId());
+        actual = mongoTemplate.find(new Query(), BookComment.class).stream()
+                .filter(bc -> bc.getBook().equals(book)).toList();
+        assertThat(actual).isEmpty();
     }
 
     @DisplayName("should return the correct number of book comments by book id")
-    @Test
-    void countByBookIdTestCase1() {
-        getNumberBookCommentsByBookId().forEach((key, value) ->
-                assertThat(repository.countByBookId(key)).isEqualTo(value));
+    @ParameterizedTest
+    @MethodSource("getBooks")
+    void countByBookIdTestCase1(Book book) {
+        long expected = mongoTemplate.find(new Query(), BookComment.class).stream()
+                .filter(bc -> bc.getBook().equals(book)).count();
+        assertThat(repository.findByBookId(book.getId()).size()).isEqualTo(expected);
     }
 
-    private static List<BookComment> getDbBookComments() {
-        List<Author> dbAuthors = getDbAuthors();
-        List<Genre> dbGenres = getDbGenres();
-        List<Book> dbBooks = getDbBooks(dbAuthors, dbGenres);
-        return getDbBookComments(dbBooks);
-    }
-
-    private static List<Author> getDbAuthors() {
-        return IntStream.range(1, 4).boxed()
-                .map(id -> new Author(id, "Author_" + id))
+    private static List<Author> getAuthors() {
+        return IntStream.range(0, 5).boxed()
+                .map(id -> new Author("author_id_" + id, "author_uuid_" + id, "Author_" + id))
                 .toList();
     }
 
-    private static List<Genre> getDbGenres() {
-        return IntStream.range(1, 7).boxed()
-                .map(id -> new Genre(id, "Genre_" + id))
-                .toList();
-    }
-
-    private static List<Book> getDbBooks(List<Author> dbAuthors, List<Genre> dbGenres) {
-        return IntStream.range(1, 4).boxed()
+    private static List<Book> getBooks() {
+        List<Author> authors = getAuthors();
+        List<Genre> genres = getGenres();
+        return IntStream.range(0, 5).boxed()
                 .map(id ->
-                        new Book(id, "BookTitle_" + id, dbAuthors.get(id - 1),
-                                dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2)))
+                        new Book("book_id_" + id, "book_uuid_" + id, "book_title_" + id,
+                                authors.get(id),
+                                List.of(genres.get(id % genres.size()), genres.get((id + 1) % genres.size()))))
                 .toList();
     }
 
-    private static List<Book> getDbBooks() {
-        List<Author> dbAuthors = getDbAuthors();
-        List<Genre> dbGenres = getDbGenres();
-        List<Book> dbBooks = getDbBooks(dbAuthors, dbGenres);
-        getDbBookComments(dbBooks);
-        return dbBooks;
-    }
-
-    private static List<BookComment> getDbBookComments(List<Book> dbBooks) {
+    private static List<BookComment> getBookComments() {
+        List<Book> books = getBooks();
         List<BookComment> bookComments = new ArrayList<>();
         int bookCommentId = 0;
-        for (Book book : dbBooks) {
+        for (Book book : books) {
             int commentNumber = 0;
-            List<BookComment> list = new ArrayList<>();
             while (commentNumber < 3) {
-                BookComment bookComment = new BookComment(++bookCommentId, book, "Book_%s_comment_%s".formatted(book.getId(), ++commentNumber));
-                list.add(bookComment);
-                bookComments.add(bookComment);
+                bookComments.add(new BookComment(
+                        "book_comment_id_" + bookCommentId,
+                        "book_comment_uuid_" + bookCommentId, book,
+                        "book_comment_text_" + bookCommentId));
+                commentNumber++;
+                bookCommentId++;
             }
-            book.setComments(list);
         }
         return bookComments;
     }
 
-    private static Map<Long, Integer> getNumberBookCommentsByBookId() {
-        Map<Long, Integer> numberBookCommentsByBookId = new HashMap<>(3);
-        numberBookCommentsByBookId.put(1L, 3);
-        numberBookCommentsByBookId.put(2L, 3);
-        numberBookCommentsByBookId.put(3L, 3);
-        numberBookCommentsByBookId.put(4L, 0);
-        return numberBookCommentsByBookId;
-    }
-
-    private static List<Long> getBookIds() {
-        return List.of(1L, 2L, 3L);
+    private static List<Genre> getGenres() {
+        return IntStream.range(0, 5).boxed()
+                .map(id -> new Genre("genre_id_" + id, "genre_uuid_" + id, "genre_name_" + id))
+                .toList();
     }
 }

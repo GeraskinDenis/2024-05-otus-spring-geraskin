@@ -7,7 +7,9 @@ import java.util.List;
 
 public interface BookRepository extends ListCrudRepository<Book, String> {
 
-    List<Book> findByAuthorFullNameLike(String fullNameSubstring);
+    List<Book> findByAuthorIn(List<String> authorIds);
+
+    List<Book> findByGenresIn(List<String> genreIds);
 
     List<Book> findByTitleLike(String titleSubstring);
 }

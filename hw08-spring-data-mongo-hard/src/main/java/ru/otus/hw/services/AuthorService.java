@@ -1,5 +1,6 @@
 package ru.otus.hw.services;
 
+import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.models.Author;
 
 import java.util.List;
@@ -15,7 +16,11 @@ public interface AuthorService {
 
     Author findByIdOrThrow(String id);
 
+    List<Author> findByFullName(String fullNameSubstring);
+
     Author insert(String fullName);
+
+    AuthorDto toDto(Author author);
 
     Author update(String id, String fullName);
 }

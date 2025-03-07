@@ -2,7 +2,9 @@ package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mappers.AuthorMapper;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.utils.CommonUtils;
@@ -15,6 +17,8 @@ import java.util.Optional;
 public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepository authorRepository;
+
+    private final AuthorMapper authorMapper;
 
     @Override
     public void deleteById(String id) {
@@ -38,8 +42,19 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    public List<Author> findByFullName(String fullNameSubstring) {
+        return authorRepository.findByFullNameLike(fullNameSubstring);
+
+    }
+
+    @Override
     public Author insert(String fullName) {
         return authorRepository.save(new Author(CommonUtils.getUUID(), fullName));
+    }
+
+    @Override
+    public AuthorDto toDto(Author author) {
+        return authorMapper.toDto(author);
     }
 
     @Override

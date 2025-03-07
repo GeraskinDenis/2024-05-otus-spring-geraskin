@@ -24,6 +24,7 @@ public class Book {
 
     private String title;
 
+    @DBRef
     private Author author;
 
     @DBRef

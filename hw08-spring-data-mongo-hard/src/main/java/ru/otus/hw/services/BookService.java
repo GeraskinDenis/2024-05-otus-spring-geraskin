@@ -1,5 +1,6 @@
 package ru.otus.hw.services;
 
+import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.models.Book;
 
 import java.util.List;
@@ -20,6 +21,8 @@ public interface BookService {
     List<Book> findByTitleSubstring(String titleSubstring);
 
     Book insert(String title, String authorId, Set<String> genreIds);
+
+    BookDto toDto(Book book);
 
     Book update(String id, String title, String authorId, Set<String> genresIds);
 }

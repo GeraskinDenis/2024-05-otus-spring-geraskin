@@ -1,7 +1,7 @@
 spring:
   shell:
     interactive:
-      enabled: true
+      enabled: false
   #    help:
   #      enabled: true
   #      long-names: help
@@ -9,13 +9,12 @@ spring:
   #      command: help
   data:
     mongodb:
-      #      uri: mongodb://localhost:27017/otus_books # TODO
-      uri: mongodb://localhost:27017/otus_books
+      uri: mongodb://localhost:27017/otus_books_test
       auto-index-creation: true
 mongock:
-  runner-type: InitializingBean
-  migration-scan-package:
-    - ru.otus.hw.migration
+  runner-type: NONE
+#  migration-scan-package:
+#    - ru.otus.hw.migration
 
 #  transaction-enabled: false
 #  enabled: true
