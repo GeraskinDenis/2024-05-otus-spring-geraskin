@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2024-07-31--0003-books
+      author: GeraskinDS
+      createTable:
+        tableName: books
+        columns:
+          - column:
+              name: id
+              type: bigint
+              autoIncrement: true
+              constraints:
+                nullable: false
+                primaryKey: true
+          - column:
+              name: title
+              type: varchar(255)
+              constraints:
+                nullable: false
+          - column:
+              name: author_id
+              type: bigint
+              constraints:
+                referencedTableName: authors
+                foreignKeyName: id
+                deleteCascade: true
