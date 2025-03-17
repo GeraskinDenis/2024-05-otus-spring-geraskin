@@ -29,7 +29,7 @@ public class BookCommentServiceImpl implements BookCommentService {
     }
 
     @Override
-    public void deleteAllByBookId(String bookId) {
+    public void deleteByBookId(String bookId) {
         bookCommentsRepository.deleteByBookId(bookId);
     }
 

@@ -29,7 +29,7 @@ public class BookCommentCommands {
     @Command(command = "del-by-book", description = "delete all book comments by book ID")
     public String deleteAllByBookId(
             @Option(longNames = "bookId", required = true, description = "book ID") String bookId) {
-        bookCommentService.deleteAllByBookId(bookId);
+        bookCommentService.deleteByBookId(bookId);
         return "Deleting all Book comments by book ID (%s) is completed.".formatted(bookId);
     }
 

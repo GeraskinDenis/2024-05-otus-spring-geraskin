@@ -61,56 +61,13 @@ class BookCommentsRepositoryTest {
         mongoTemplate.remove(new Query(), Genre.class);
     }
 
-    @DisplayName("should find book comment by book id correctly")
-    @ParameterizedTest
-    @MethodSource("getBookComments")
-    void findByIdTestCase1(BookComment expected) {
-        var actual = repository.findById(expected.getId());
-        assertThat(actual).isPresent().get()
-                .isEqualTo(expected);
-    }
-
-
-    @DisplayName("should find all 'BookComments' by book id")
+    @DisplayName("should return the correct number of book comments by book id")
     @ParameterizedTest
     @MethodSource("getBooks")
-    void findByBookIdTestCase1(Book book) {
-        var expected = getBookComments().stream()
-                .filter(bc -> bc.getBook().equals(book)).toList();
-        var actual = repository.findByBookId(book.getId());
-        assertThat(actual).containsExactlyElementsOf(expected);
-    }
-
-    @DisplayName("should save a new 'BookComment correctly")
-    @ParameterizedTest
-    @MethodSource("getBooks")
-    void shouldSaveNew(Book book) {
-        var expected = new BookComment("book_comment_id_test", "book_comment_uuid_test",
-                book, "book_comment_text_test");
-        expected = repository.save(expected);
-        assertThat(mongoTemplate.findById(expected.getId(), BookComment.class)).isEqualTo(expected);
-    }
-
-    @DisplayName("should update book comment correctly")
-    @ParameterizedTest
-    @MethodSource("getBookComments")
-    void shouldSaveUpdatedBookComment(BookComment expected) {
-        expected = mongoTemplate.findById(expected.getId(), BookComment.class);
-        assertThat(expected).isNotNull();
-        expected = new BookComment(expected.getId(), expected.getUuid(), expected.getBook(),
-                "book_comment_new_text");
-        expected = repository.save(expected);
-        var actual = mongoTemplate.findById(expected.getId(), BookComment.class);
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @DisplayName("should remove book comment by id")
-    @ParameterizedTest
-    @MethodSource("getBookComments")
-    void deleteByIdTestCase1(BookComment bookComment) {
-        assertThat(mongoTemplate.findById(bookComment.getId(), BookComment.class)).isEqualTo(bookComment);
-        repository.deleteById(bookComment.getId());
-        assertThat(mongoTemplate.findById(bookComment.getId(), BookComment.class)).isNull();
+    void countByBookIdTestCase1(Book book) {
+        long expected = mongoTemplate.find(new Query(), BookComment.class).stream()
+                .filter(bc -> bc.getBook().equals(book)).count();
+        assertThat(repository.findByBookId(book.getId()).size()).isEqualTo(expected);
     }
 
     @DisplayName("should remove all book comment by book id")
@@ -126,13 +83,55 @@ class BookCommentsRepositoryTest {
         assertThat(actual).isEmpty();
     }
 
-    @DisplayName("should return the correct number of book comments by book id")
+    @DisplayName("should remove book comment by id")
+    @ParameterizedTest
+    @MethodSource("getBookComments")
+    void deleteByIdTestCase1(BookComment bookComment) {
+        assertThat(mongoTemplate.findById(bookComment.getId(), BookComment.class)).isEqualTo(bookComment);
+        repository.deleteById(bookComment.getId());
+        assertThat(mongoTemplate.findById(bookComment.getId(), BookComment.class)).isNull();
+    }
+
+    @DisplayName("should find all 'BookComments' by 'Book' id")
     @ParameterizedTest
     @MethodSource("getBooks")
-    void countByBookIdTestCase1(Book book) {
-        long expected = mongoTemplate.find(new Query(), BookComment.class).stream()
-                .filter(bc -> bc.getBook().equals(book)).count();
-        assertThat(repository.findByBookId(book.getId()).size()).isEqualTo(expected);
+    void findByBookIdTestCase1(Book book) {
+        var expected = getBookComments().stream()
+                .filter(bc -> bc.getBook().equals(book)).toList();
+        var actual = repository.findByBookId(book.getId());
+        assertThat(actual).containsExactlyElementsOf(expected);
+    }
+
+    @DisplayName("should find 'BookComment' by id")
+    @ParameterizedTest
+    @MethodSource("getBookComments")
+    void findByIdTestCase1(BookComment expected) {
+        var actual = repository.findById(expected.getId());
+        assertThat(actual).isPresent().get()
+                .isEqualTo(expected);
+    }
+
+    @DisplayName("should save a new 'BookComment' correctly")
+    @ParameterizedTest
+    @MethodSource("getBooks")
+    void saveTestCase1(Book book) {
+        var expected = new BookComment("book_comment_id_test", "book_comment_uuid_test",
+                book, "book_comment_text_test");
+        expected = repository.save(expected);
+        assertThat(mongoTemplate.findById(expected.getId(), BookComment.class)).isEqualTo(expected);
+    }
+
+    @DisplayName("should update book comment correctly")
+    @ParameterizedTest
+    @MethodSource("getBookComments")
+    void saveTestCase2(BookComment expected) {
+        expected = mongoTemplate.findById(expected.getId(), BookComment.class);
+        assertThat(expected).isNotNull();
+        expected = new BookComment(expected.getId(), expected.getUuid(), expected.getBook(),
+                "book_comment_new_text");
+        expected = repository.save(expected);
+        var actual = mongoTemplate.findById(expected.getId(), BookComment.class);
+        assertThat(actual).isEqualTo(expected);
     }
 
     private static List<Author> getAuthors() {

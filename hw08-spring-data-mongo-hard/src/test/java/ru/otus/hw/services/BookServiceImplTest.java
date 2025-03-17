@@ -69,7 +69,7 @@ public class BookServiceImplTest {
         mongoTemplate.remove(new Query(), Genre.class);
     }
 
-    @DisplayName("should delete book by id")
+    @DisplayName("should delete a 'Book' by id")
     @ParameterizedTest
     @MethodSource("getBooks")
     void deleteByIdTestCase1(Book book) {
@@ -78,13 +78,13 @@ public class BookServiceImplTest {
         assertThat(mongoTemplate.findById(book.getId(), Book.class)).isNull();
     }
 
-    @DisplayName("should return the correct list of books")
+    @DisplayName("should find all 'Books'")
     @Test
     void findAllTestCase1() {
         assertThat(bookService.findAll()).containsExactlyElementsOf(getBooks());
     }
 
-    @DisplayName("should find all books by Author full name substring")
+    @DisplayName("should find all 'Books' by Author full name substring")
     @ParameterizedTest
     @MethodSource("getAuthorFullNameSubstring")
     public void findByAuthorFullNameSubstringTestCase1(String fullNameSubstring) {
@@ -98,7 +98,7 @@ public class BookServiceImplTest {
         assertThat(actual).containsExactlyElementsOf(expected);
     }
 
-    @DisplayName("should find book by id correct")
+    @DisplayName("should find a 'Book' by id")
     @ParameterizedTest
     @MethodSource("getBooks")
     void findByIdTestCase1(Book book) {
@@ -118,7 +118,7 @@ public class BookServiceImplTest {
         assertThat(bookService.findByTitleSubstring(expected.getTitle())).contains(expected);
     }
 
-    @DisplayName("should find all books by title substring")
+    @DisplayName("should find all 'Books' by title substring")
     @Test
     public void findByTitleSubstringTestCase2() {
         List<Book> expected = getBooks();
@@ -126,7 +126,7 @@ public class BookServiceImplTest {
         assertThat(actual).containsExactlyElementsOf(expected);
     }
 
-    @DisplayName("should insert the new book correctly")
+    @DisplayName("should insert the new 'Book'")
     @Test
     void insertTestCase1() {
         var genres = mongoTemplate.find(new Query(), Genre.class);
@@ -136,7 +136,7 @@ public class BookServiceImplTest {
         assertThat(mongoTemplate.findById(expected.getId(), Book.class)).isEqualTo(expected);
     }
 
-    @DisplayName("should update the existing book correctly")
+    @DisplayName("should update the existing 'Book' correctly")
     @ParameterizedTest
     @MethodSource("getBooks")
     void saveTestCase2(Book book) {
@@ -149,7 +149,7 @@ public class BookServiceImplTest {
         assertThat(mongoTemplate.findById(expected.getId(), Book.class)).isEqualTo(expected);
     }
 
-    @DisplayName("should convert 'Book' to DTO correctly")
+    @DisplayName("should convert a 'Book' to DTO correctly")
     @ParameterizedTest
     @MethodSource("getBooks")
     void toDtoTestCase1(Book book) {

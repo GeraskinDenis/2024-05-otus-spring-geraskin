@@ -10,7 +10,7 @@ public interface BookCommentService {
 
     int countByBookId(String bookId);
 
-    void deleteAllByBookId(String bookId);
+    void deleteByBookId(String bookId);
 
     void deleteById(String id);
 
