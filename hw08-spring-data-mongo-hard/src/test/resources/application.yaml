@@ -1,0 +1,36 @@
+spring:
+  shell:
+    interactive:
+      enabled: false
+  #    help:
+  #      enabled: true
+  #      long-names: help
+  #      short-names: h
+  #      command: help
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/otus_books_test
+      auto-index-creation: true
+mongock:
+  runner-type: NONE
+#  migration-scan-package:
+#    - ru.otus.hw.migration
+
+#  transaction-enabled: false
+#  enabled: true
+#  runner-type: InitializingBean
+#  runner-type: ApplicationRunner
+##  transactional: true
+#  mongo-db:
+#    write-concern:
+#      journal: false
+#    read-concern: local
+
+#logging:
+#  level:
+#    org:
+#      springframework:
+#        data:
+#          mongodb:
+#            core:
+#              MongoTemplate: DEBUG
