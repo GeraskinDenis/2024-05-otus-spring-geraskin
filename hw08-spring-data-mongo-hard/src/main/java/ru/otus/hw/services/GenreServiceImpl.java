@@ -28,14 +28,8 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    public Optional<Genre> findById(String id) {
-        return genreRepository.findById(id);
-    }
-
-    @Override
-    public Genre findByIdOrThrow(String id) {
-        return genreRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("'Genre' not found by id: " + id));
+    public List<Genre> findAll() {
+        return genreRepository.findAll();
     }
 
     @Override
@@ -55,8 +49,19 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    public List<Genre> findAll() {
-        return genreRepository.findAll();
+    public Optional<Genre> findById(String id) {
+        return genreRepository.findById(id);
+    }
+
+    @Override
+    public Genre findByIdOrThrow(String id) {
+        return genreRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("'Genre' not found by id: " + id));
+    }
+
+    @Override
+    public List<Genre> findByNameSubstring(String nameSubstring) {
+        return genreRepository.findByNameLike(nameSubstring);
     }
 
     @Override

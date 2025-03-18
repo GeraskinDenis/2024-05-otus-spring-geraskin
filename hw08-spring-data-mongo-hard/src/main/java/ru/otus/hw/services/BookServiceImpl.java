@@ -47,6 +47,12 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public List<Book> findByGenreNameSubstring(String nameSubstring) {
+        List<Genre> genres = genreService.findByNameSubstring(nameSubstring);
+        return bookRepository.findByGenresIn(genres.stream().map(Genre::getId).toList());
+    }
+
+    @Override
     public Book findByIdOrThrow(String id) {
         return bookRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("'Book' not found by id: " + id));

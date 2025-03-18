@@ -93,7 +93,7 @@ class BookRepositoryTest {
         assertThat(actual).containsExactlyElementsOf(expected);
     }
 
-    @DisplayName("should find books by genre ids")
+    @DisplayName("should find 'Books' by 'Genre' ids")
     @ParameterizedTest
     @MethodSource("getGenres")
     public void findByGenresInTestCase1(Genre genre) {

@@ -16,6 +16,8 @@ public interface BookService {
 
     Optional<Book> findById(String id);
 
+    List<Book> findByGenreNameSubstring(String nameSubstring);
+
     Book findByIdOrThrow(String id);
 
     List<Book> findByTitleSubstring(String titleSubstring);

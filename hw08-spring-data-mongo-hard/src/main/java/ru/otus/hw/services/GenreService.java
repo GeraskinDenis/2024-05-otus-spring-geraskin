@@ -11,13 +11,15 @@ public interface GenreService {
 
     void deleteById(String id);
 
+    List<Genre> findAll();
+
+    List<Genre> findAllByIdOrThrow(Set<String> ids);
+
     Optional<Genre> findById(String id);
 
     Genre findByIdOrThrow(String id);
 
-    List<Genre> findAllByIdOrThrow(Set<String> ids);
-
-    List<Genre> findAll();
+    List<Genre> findByNameSubstring(String nameSubstring);
 
     Genre insert(String name);
 

@@ -7,23 +7,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.mongodb.core.MongoAction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import ru.otus.hw.dto.AuthorDto;
-import ru.otus.hw.dto.BookCommentDto;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
-import ru.otus.hw.mappers.*;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.BookComment;
 import ru.otus.hw.models.Genre;
-import ru.otus.hw.repositories.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -86,7 +80,7 @@ public class BookServiceImplTest {
 
     @DisplayName("should find all 'Books' by Author full name substring")
     @ParameterizedTest
-    @MethodSource("getAuthorFullNameSubstring")
+    @MethodSource("getSubstringsOfAuthorFullNames")
     public void findByAuthorFullNameSubstringTestCase1(String fullNameSubstring) {
         List<Book> expected = getBooks().stream()
                 .filter(book -> book.getAuthor()
@@ -95,6 +89,15 @@ public class BookServiceImplTest {
                         .contains(fullNameSubstring.toLowerCase())
                 ).toList();
         List<Book> actual = bookService.findByAuthorFullNameSubstring(fullNameSubstring);
+        assertThat(actual).containsExactlyElementsOf(expected);
+    }
+
+    @DisplayName("should find all 'Books' by 'Genre' name substring")
+    @ParameterizedTest
+    @MethodSource("getSubstringsOfGenreNames")
+    void findByGenreNameSubstringTestCase1(String substring) {
+        List<Book> expected = getBooks().stream().filter(book -> book.getGenres().stream().anyMatch(genre -> genre.getName().contains(substring))).toList();
+        List<Book> actual = bookService.findByGenreNameSubstring(substring);
         assertThat(actual).containsExactlyElementsOf(expected);
     }
 
@@ -107,7 +110,7 @@ public class BookServiceImplTest {
 
     @DisplayName("should throw an Exception because the 'Book' was not found by id")
     @Test
-    void findByIdTestCase() {
+    void findByIdTestCase1() {
         assertThatThrownBy(() -> bookService.findByIdOrThrow("book_id_dummy")).isInstanceOf(EntityNotFoundException.class);
     }
 
@@ -203,7 +206,7 @@ public class BookServiceImplTest {
                 .toList();
     }
 
-    private static List<String> getAuthorFullNameSubstring() {
+    private static List<String> getSubstringsOfAuthorFullNames() {
         List<String> subStrings = IntStream.range(0, 5).boxed().map(id -> "author_fullname_" + id)
                 .collect(Collectors.toList());
         subStrings.add("hor_full");
@@ -211,6 +214,15 @@ public class BookServiceImplTest {
         subStrings.add("fullname");
         subStrings.add("dummy_full_name");
         return subStrings;
+    }
+
+    private static List<String> getSubstringsOfGenreNames() {
+        List<String> substrings = IntStream.range(0, 5).boxed()
+                .map(id -> "genre_name_" + id).collect(Collectors.toList());
+        substrings.add("genre_name_");
+        substrings.add("nre_na");
+        substrings.add("genre_name_dummy");
+        return substrings;
     }
 
 }

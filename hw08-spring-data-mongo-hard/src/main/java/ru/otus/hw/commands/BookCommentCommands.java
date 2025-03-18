@@ -9,7 +9,7 @@ import ru.otus.hw.services.BookCommentService;
 
 import java.util.stream.Collectors;
 
-@Command(group = "Book commentary commands", command = "book-com")
+@Command(group = "Book commentary commands", command = "comment")
 @RequiredArgsConstructor
 public class BookCommentCommands {
 
