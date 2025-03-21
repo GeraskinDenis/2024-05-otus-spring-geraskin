@@ -1,8 +1,9 @@
 package ru.otus.hw.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Service
 public class LocalizedIOServiceImpl implements LocalizedIOService {
 
@@ -10,16 +11,9 @@ public class LocalizedIOServiceImpl implements LocalizedIOService {
 
     private final IOService ioService;
 
-    public LocalizedIOServiceImpl(@Qualifier("localizedMessagesService")
-                                  LocalizedMessagesService localizedMessagesService,
-                                  IOService ioService) {
-        this.localizedMessagesService = localizedMessagesService;
-        this.ioService = ioService;
-    }
-
     @Override
-    public void printLine(String s) {
-        ioService.printLine(s);
+    public String getMessage(String code, Object... args) {
+        return localizedMessagesService.getMessage(code, args);
     }
 
     @Override
@@ -28,13 +22,18 @@ public class LocalizedIOServiceImpl implements LocalizedIOService {
     }
 
     @Override
-    public String readString() {
-        return ioService.readString();
+    public void printFormattedLineLocalized(String code, Object... args) {
+        ioService.printLine(localizedMessagesService.getMessage(code, args));
     }
 
     @Override
-    public String readStringWithPrompt(String prompt) {
-        return ioService.readStringWithPrompt(prompt);
+    public void printLine(String s) {
+        ioService.printLine(s);
+    }
+
+    @Override
+    public void printLineLocalized(String code) {
+        ioService.printLine(localizedMessagesService.getMessage(code));
     }
 
     @Override
@@ -49,26 +48,29 @@ public class LocalizedIOServiceImpl implements LocalizedIOService {
     }
 
     @Override
-    public int readIntForRangeWithPrompt(int min,
-                                         int max,
+    public int readIntForRangeLocalized(int min, int max,
+                                        String invalidInputFormatMessage,
+                                        String errorMessageCode) {
+        return ioService.readIntForRange(min, max, invalidInputFormatMessage,
+                localizedMessagesService.getMessage(errorMessageCode));
+    }
+
+    @Override
+    public int readIntForRangeWithPrompt(int min, int max,
                                          String prompt,
                                          String invalidInputFormatMessage,
                                          String errorMessage) {
-        return ioService.readIntForRangeWithPrompt(min,
-                max,
-                prompt,
-                invalidInputFormatMessage,
-                errorMessage);
+        return ioService.readIntForRangeWithPrompt(min, max, prompt, invalidInputFormatMessage, errorMessage);
     }
 
     @Override
-    public void printLineLocalized(String code) {
-        ioService.printLine(localizedMessagesService.getMessage(code));
+    public String readString() {
+        return ioService.readString();
     }
 
     @Override
-    public void printFormattedLineLocalized(String code, Object... args) {
-        ioService.printLine(localizedMessagesService.getMessage(code, args));
+    public String readStringWithPrompt(String prompt) {
+        return ioService.readStringWithPrompt(prompt);
     }
 
     @Override
@@ -77,28 +79,14 @@ public class LocalizedIOServiceImpl implements LocalizedIOService {
     }
 
     @Override
-    public int readIntForRangeLocalized(int min, int max, String invalidInputFormatMessage,
-                                        String errorMessageCode) {
-        return ioService.readIntForRange(min, max, invalidInputFormatMessage,
-                localizedMessagesService.getMessage(errorMessageCode));
-    }
-
-    @Override
-    public int readIntForRangeWithPromptLocalized(int min,
-                                                  int max,
+    public int readIntForRangeWithPromptLocalized(int min, int max,
                                                   String promptCode,
                                                   String invalidInputFormatMessage,
                                                   String errorMessageCode) {
-        return ioService.readIntForRangeWithPrompt(min,
-                max,
+        return ioService.readIntForRangeWithPrompt(min, max,
                 localizedMessagesService.getMessage(promptCode),
                 localizedMessagesService.getMessage(invalidInputFormatMessage),
                 localizedMessagesService.getMessage(errorMessageCode)
         );
-    }
-
-    @Override
-    public String getMessage(String code, Object... args) {
-        return localizedMessagesService.getMessage(code, args);
     }
 }

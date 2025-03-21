@@ -1,6 +1,7 @@
 package ru.otus.hw.service;
 
 public interface IOService {
+
     void printLine(String s);
 
     void printFormattedLine(String s, Object... args);
@@ -11,6 +12,9 @@ public interface IOService {
 
     int readIntForRange(int min, int max, String invalidInputFormatMessage, String errorMessage);
 
-    int readIntForRangeWithPrompt(int min, int max, String prompt,
-                                  String invalidInputFormatMessage, String errorMessage);
+    int readIntForRangeWithPrompt(int min, int max,
+                                  String prompt,
+                                  String invalidInputFormatMessage,
+                                  String errorMessage);
+
 }
