@@ -1,0 +1,86 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2024-09-12--0008-data
+      author: GeraskinDS
+      changes:
+        - insert:
+            tableName: book_comments
+            columns:
+              - column:
+                  name: book_id
+                  value: 1
+              - column:
+                  name: text
+                  value: 'Book_1_comment_1'
+        - insert:
+            tableName: book_comments
+            columns:
+              - column:
+                  name: book_id
+                  value: 1
+              - column:
+                  name: text
+                  value: 'Book_1_comment_2'
+        - insert:
+            tableName: book_comments
+            columns:
+              - column:
+                  name: book_id
+                  value: 1
+              - column:
+                  name: text
+                  value: 'Book_1_comment_3'
+        - insert:
+            tableName: book_comments
+            columns:
+              - column:
+                  name: book_id
+                  value: 2
+              - column:
+                  name: text
+                  value: 'Book_2_comment_1'
+        - insert:
+            tableName: book_comments
+            columns:
+              - column:
+                  name: book_id
+                  value: 2
+              - column:
+                  name: text
+                  value: 'Book_2_comment_2'
+        - insert:
+            tableName: book_comments
+            columns:
+              - column:
+                  name: book_id
+                  value: 2
+              - column:
+                  name: text
+                  value: 'Book_2_comment_3'
+        - insert:
+            tableName: book_comments
+            columns:
+              - column:
+                  name: book_id
+                  value: 3
+              - column:
+                  name: text
+                  value: 'Book_3_comment_1'
+        - insert:
+            tableName: book_comments
+            columns:
+              - column:
+                  name: book_id
+                  value: 3
+              - column:
+                  name: text
+                  value: 'Book_3_comment_2'
+        - insert:
+            tableName: book_comments
+            columns:
+              - column:
+                  name: book_id
+                  value: 3
+              - column:
+                  name: text
+                  value: 'Book_3_comment_3'
