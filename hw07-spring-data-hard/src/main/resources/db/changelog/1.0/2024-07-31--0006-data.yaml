@@ -91,6 +91,24 @@ databaseChangeLog:
                   name: author_id
                   value: 3
         - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: title
+                  value: 'BookTitle_4'
+              - column:
+                  name: author_id
+                  value: 3
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: title
+                  value: 'BookTitle_5'
+              - column:
+                  name: author_id
+                  value: 3
+        - insert:
             tableName: books_genres
             columns:
               - column:
@@ -144,3 +162,39 @@ databaseChangeLog:
               - column:
                   name: genre_id
                   value: 6
+        - insert:
+            tableName: books_genres
+            columns:
+              - column:
+                  name: book_id
+                  value: 4
+              - column:
+                  name: genre_id
+                  value: 1
+        - insert:
+            tableName: books_genres
+            columns:
+              - column:
+                  name: book_id
+                  value: 4
+              - column:
+                  name: genre_id
+                  value: 6
+        - insert:
+            tableName: books_genres
+            columns:
+              - column:
+                  name: book_id
+                  value: 5
+              - column:
+                  name: genre_id
+                  value: 2
+        - insert:
+            tableName: books_genres
+            columns:
+              - column:
+                  name: book_id
+                  value: 5
+              - column:
+                  name: genre_id
+                  value: 4

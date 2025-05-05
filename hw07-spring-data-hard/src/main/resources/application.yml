@@ -4,6 +4,9 @@ spring:
   liquibase:
     liquibaseSchema: system
     defaultSchema: public
+  shell:
+    interactive:
+      enabled: true
   jpa:
     properties:
       hibernate:

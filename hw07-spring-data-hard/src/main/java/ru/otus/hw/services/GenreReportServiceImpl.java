@@ -2,38 +2,40 @@ package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.otus.hw.dto.Report;
+import ru.otus.hw.dto.ReportDto;
 import ru.otus.hw.repositories.GenreRepository;
+import ru.otus.hw.repositories.projections.NumberOfBooksByGenre;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class GenreReportServiceImpl implements GenreReportService {
+
     private final GenreRepository genreRepository;
 
     @Override
-    public Report getNumberOfBooksByGenre() {
+    public ReportDto countBooksByGenre() {
         String reportName = "--- Number of books by genres ---";
-        List<Map<String, Object>> queryResult = genreRepository.getNumberOfBooksByGenre();
-        return new Report(reportName, convertToRows(queryResult));
+        List<NumberOfBooksByGenre> queryResult = genreRepository.countBooksByGenres();
+        return new ReportDto(reportName, convertToRows(queryResult));
     }
 
-    private List<List<String>> convertToRows(List<Map<String, Object>> rowDataList) {
-        List<List<String>> rows = new ArrayList<>();
-        rows.add(List.of("№", "Genre", "Number of books"));
-        List<String> fieldNames = new ArrayList<>();
-        fieldNames.add("name");
-        fieldNames.add("number");
-        int i = 0;
-        for (Map<String, Object> data : rowDataList) {
-            List<String> row = new ArrayList<>(3);
-            row.add(String.valueOf(++i));
-            for (String field : fieldNames) {
-                row.add(data.get(field).toString());
-            }
-            rows.add(row);
+    @Override
+    public ReportDto countBooksByGenre(List<Long> genreIds) {
+        String reportName = "--- Number of books by genres ---";
+        List<NumberOfBooksByGenre> queryResult = genreRepository.countBooksByGenres(genreIds);
+        return new ReportDto(reportName, convertToRows(queryResult));
+    }
+
+    private List<List<String>> convertToRows(List<NumberOfBooksByGenre> rowDataList) {
+        List<List<String>> rows = new ArrayList<>(rowDataList.size());
+        rows.add(List.of("№", "ID", "Genre", "Number of books"));
+        int i = 1;
+        for (NumberOfBooksByGenre data : rowDataList) {
+            rows.add(List.of(String.valueOf(i++), String.valueOf(data.getId()),
+                    data.getName(), String.valueOf(data.getNumber())));
         }
         return rows;
     }

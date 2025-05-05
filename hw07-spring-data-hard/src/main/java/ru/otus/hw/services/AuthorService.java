@@ -1,23 +1,25 @@
 package ru.otus.hw.services;
 
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.dto.AuthorDto;
-import ru.otus.hw.dto.Report;
+import ru.otus.hw.models.Author;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface AuthorService {
 
-    void deleteById(long id);
-
     List<AuthorDto> findAll();
 
     Optional<AuthorDto> findById(long id);
 
-    Report getNumberOfBooksByAuthors();
+    Author findByIdOrThrow(long id);
 
-    AuthorDto insert(String fullName);
+    void deleteById(long id);
 
-    AuthorDto update(long id, String fullName);
+    AuthorDto save(long id, String fullName);
 
+    AuthorDto toDto(Author author);
+
+    Author toObject(AuthorDto authorDto);
 }
