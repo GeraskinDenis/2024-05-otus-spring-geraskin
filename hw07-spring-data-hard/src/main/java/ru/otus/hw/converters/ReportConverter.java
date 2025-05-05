@@ -1,18 +1,19 @@
 package ru.otus.hw.converters;
 
 import org.springframework.stereotype.Component;
-import ru.otus.hw.dto.Report;
+import ru.otus.hw.dto.ReportDto;
 
 import java.util.List;
 
 @Component
 public class ReportConverter {
+
     private final int columnLength = 20;
 
-    public String reportToString(Report report) {
-        StringBuilder builder = new StringBuilder(report.reportName())
+    public String reportToString(ReportDto reportDto) {
+        StringBuilder builder = new StringBuilder(reportDto.reportName())
                 .append(System.lineSeparator());
-        List<List<String>> rows = report.rows();
+        List<List<String>> rows = reportDto.rows();
         for (List<String> row : rows) {
             for (String s : row) {
                 builder.append(formatString(s));

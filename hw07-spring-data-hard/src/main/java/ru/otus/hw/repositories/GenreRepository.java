@@ -6,6 +6,6 @@ import ru.otus.hw.models.Genre;
 import java.util.Collection;
 import java.util.List;
 
-public interface GenreRepository extends ListCrudRepository<Genre, Long>, GenreReport {
+public interface GenreRepository extends ListCrudRepository<Genre, Long>, GenreRepositoryReport {
     List<Genre> findByIdIn(Collection<Long> ids);
 }

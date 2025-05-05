@@ -1,26 +1,40 @@
 package ru.otus.hw.services;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.dto.AuthorDto;
-import ru.otus.hw.dto.Report;
-import ru.otus.hw.mappers.AuthorMapper;
+import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mappers.Mapper;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.repositories.AuthorRepository;
-import ru.otus.hw.repositories.projections.NumberOfBooksByAuthor;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepository authorRepository;
 
-    private final AuthorMapper authorMapper;
+    private final Mapper<Author, AuthorDto> authorMapper;
+
+    public AuthorServiceImpl(AuthorRepository authorRepository,
+                             @Qualifier("authorMapper") Mapper<Author, AuthorDto> authorMapper) {
+        this.authorRepository = authorRepository;
+        this.authorMapper = authorMapper;
+    }
+
+    @Transactional
+    @Override
+    public void deleteById(long id) {
+        authorRepository.deleteById(id);
+    }
+
+    @Override
+    public List<AuthorDto> findAll() {
+        return authorRepository.findAll().stream().map(authorMapper::toDto).toList();
+    }
 
     @Override
     public Optional<AuthorDto> findById(long id) {
@@ -32,46 +46,27 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public List<AuthorDto> findAll() {
-        return authorRepository.findAll().stream().map(authorMapper::toDto).toList();
-    }
-
-    @Override
-    public Report getNumberOfBooksByAuthors() {
-        String reportName = "--- The number of books by authors ---";
-        List<NumberOfBooksByAuthor> dataList = authorRepository.getNumberOfBooksByAuthors();
-        return new Report(reportName, convertToRows(dataList));
+    public Author findByIdOrThrow(long id) {
+        return authorRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Author not found by `id`: " + id));
     }
 
     @Transactional
     @Override
-    public AuthorDto insert(String fullName) {
-        Author author = new Author(0, fullName);
-        author = authorRepository.save(author);
-        return authorMapper.toDto(author);
-    }
-
-    @Transactional
-    @Override
-    public AuthorDto update(long id, String fullName) {
+    public AuthorDto save(long id, String fullName) {
         Author author = new Author(id, fullName);
         author = authorRepository.save(author);
         return authorMapper.toDto(author);
     }
 
-    @Transactional
     @Override
-    public void deleteById(long id) {
-        authorRepository.deleteById(id);
+    public AuthorDto toDto(Author author) {
+        return authorMapper.toDto(author);
     }
 
-    private List<List<String>> convertToRows(List<NumberOfBooksByAuthor> dataList) {
-        List<List<String>> rows = new ArrayList<>(dataList.size());
-        rows.add(List.of("Author", "Number"));
-        for (NumberOfBooksByAuthor data : dataList) {
-            rows.add(List.of(data.getAuthorFullName(), data.getNumber().toString()));
-        }
-        return rows;
+    @Override
+    public Author toObject(AuthorDto authorDto) {
+        return authorMapper.toObject(authorDto);
     }
 }
 

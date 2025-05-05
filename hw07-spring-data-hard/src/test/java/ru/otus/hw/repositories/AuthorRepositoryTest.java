@@ -1,33 +1,35 @@
 package ru.otus.hw.repositories;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.repositories.projections.NumberOfBooksByAuthor;
 
 import java.util.*;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatList;
 
+// В этом тесте не используется аннотация `@DataJpaTest`,
+// потому что данная аннотация отключает Liquibase
 @DisplayName("Репозиторий на основе JPA для работы с 'Авторами'")
-@DataJpaTest
-//@Import(AuthorRepository.class)
+@SpringBootTest // поднимает Контекст приложения
+// по умолчанию загружается основная конфигурация `src/main/resource/application.yml`
+// следующая аннотация заменяет значения указанных параметров для выполнения тестов
+@TestPropertySource(properties = {"spring.datasource.url=jdbc:h2:mem:testdb", "spring.shell.interactive.enabled=false"})
+@AutoConfigureTestEntityManager // добавляем `org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager`,
+// который не доступен с аннотацией `@SpringBootTest`, а доступен с аннотацией `@DataJpaTest`
+@Transactional // Откатывает изменения после теста
 public class AuthorRepositoryTest {
 
     @Autowired
@@ -75,7 +77,7 @@ public class AuthorRepositoryTest {
         // Так же старался, что бы реализация содержала как можно меньше кода, что бы его тоже не пришлось тестировать.
         // Но кода получилось много для тестового метода, но он понятный и простой.
         List<NumberOfBooksByAuthor> expected = getListOfNumberOfBooksByAuthors();
-        List<NumberOfBooksByAuthor> actual = repository.getNumberOfBooksByAuthors();
+        List<NumberOfBooksByAuthor> actual = repository.countBooksByAuthors();
         assertThat(actual.size()).isEqualTo(expected.size());
         for (NumberOfBooksByAuthor a : actual) {
             boolean exists = false;
@@ -149,7 +151,7 @@ public class AuthorRepositoryTest {
         Map<String, Integer> expectedData = new HashMap<>(3);
         expectedData.put("Author_1", 1);
         expectedData.put("Author_2", 1);
-        expectedData.put("Author_3", 1);
+        expectedData.put("Author_3", 3);
         return expectedData.entrySet().stream().map(e -> {
             NumberOfBooksByAuthor mockEntity = Mockito.mock(NumberOfBooksByAuthor.class);
             Mockito.when(mockEntity.getAuthorFullName()).thenReturn(e.getKey());

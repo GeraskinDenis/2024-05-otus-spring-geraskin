@@ -1,9 +1,8 @@
 package ru.otus.hw.commands;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellOption;
+import org.springframework.shell.command.annotation.Command;
+import org.springframework.shell.command.annotation.Option;
 import ru.otus.hw.converters.BookCommentConverter;
 import ru.otus.hw.dto.BookCommentDto;
 import ru.otus.hw.services.BookCommentService;
@@ -11,58 +10,66 @@ import ru.otus.hw.services.BookCommentService;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ShellComponent
+@Command(command = "book-comment", group = "Book comments commands")
 @RequiredArgsConstructor
 public class BookCommentCommands {
+
     private final BookCommentService bookCommentService;
 
     private final BookCommentConverter bookCommentConverter;
 
-    @ShellMethod(value = "Delete all book comments by book ID", key = "cda")
-    public String deleteAllByBookId(@ShellOption(value = "bookId", help = "book ID") long bookId) {
+    @Command(command = "del-all-by-book", description = "delete all Book comments by Book ID")
+    public String deleteAllByBookId(@Option(longNames = "bookId", required = true,
+            arityMin = 1, label = "Book ID to delete Book comments") long bookId) {
         bookCommentService.deleteAllByBookId(bookId);
-        return "Deleting all Book comments by book ID (%s) is completed.".formatted(bookId);
+        return "Deleting all Book comments by Book ID (%s) is completed.".formatted(bookId);
     }
 
-    @ShellMethod(value = "Delete a book comment by ID", key = "cd")
-    public String deleteById(@ShellOption(value = "id", help = "book comment ID") long id) {
+    @Command(command = "del", description = "delete a Book comment by ID")
+    public String deleteById(@Option(longNames = "id", required = true, arityMin = 1, label = "Book comment ID")
+                             long id) {
         bookCommentService.deleteById(id);
         return "Deletion a Book comment by ID (%s) is completed.".formatted(id);
     }
 
-    @ShellMethod(value = "Find a book comment by ID", key = "cf")
-    public String findById(@ShellOption(value = "id", help = "book comment ID") long id) {
+    @Command(command = "find", description = "find a Book comment by ID")
+    public String findById(@Option(longNames = "id", required = true, arityMin = 1, label = "Book comment ID")
+                           long id) {
         return bookCommentService.findById(id)
                 .map(bookCommentConverter::bookCommentToString)
-                .orElse("No book comment found by ID: " + id);
+                .orElse("No Book comment found by ID: " + id);
     }
 
-    @ShellMethod(value = "Find all comments by book ID", key = "ca")
-    public String findAllByBookId(@ShellOption(value = "bookId", help = "book id") long bookId) {
-        List<BookCommentDto> list = bookCommentService.findByBook(bookId);
+    @Command(command = "find-all-by-book", description = "find all Book comments by book ID")
+    public String findAllByBookId(@Option(longNames = "bookId", required = true, arityMin = 1, label = "Book id")
+                                  long bookId) {
+        List<BookCommentDto> list = bookCommentService.findByBookId(bookId);
         if (list.isEmpty()) {
-            return "No book comments found by book ID: " + bookId;
+            return "No Book comments found by Book ID: " + bookId;
         } else {
             return list.stream().map(bookCommentConverter::bookCommentToString)
                     .collect(Collectors.joining(System.lineSeparator()));
         }
     }
 
-    @ShellMethod(value = "Get the number of book comments by book Id", key = "cn")
-    public String getNumberByBookId(@ShellOption(value = "bookId", help = "BookID") long bookId) {
-        return bookCommentService.getNumberByBookId(bookId).toString();
+    @Command(command = "count-by-book", description = "number of Book comments by Book Id")
+    public String getNumberByBookId(@Option(longNames = "bookId", required = true, arityMin = 1, label = "Book ID")
+                                    long bookId) {
+        return bookCommentService.countByBookId(bookId).toString();
     }
 
-    @ShellMethod(value = "Insert a new book comment", key = "ci")
-    public String insert(@ShellOption(value = "bookId", help = "Book ID") long bookId,
-                         @ShellOption(value = "textComment", help = "text of comment") String textComment) {
-        return bookCommentConverter.bookCommentToString(bookCommentService.insert(bookId, textComment));
+    @Command(command = "add", description = "add a new Book comment")
+    public String insert(@Option(longNames = "bookId", required = true, arityMin = 1, label = "Book ID") long bookId,
+                         @Option(longNames = "textComment", required = true, label = "text of comment")
+                         String textComment) {
+        return bookCommentConverter.bookCommentToString(bookCommentService.save(0L, bookId, textComment));
     }
 
-    @ShellMethod(value = "Update a book comment", key = "cu")
-    public String update(@ShellOption(value = "id", help = "book comment ID") long id,
-                         @ShellOption(value = "bookId", help = "Book ID") long bookId,
-                         @ShellOption(value = "textComment", help = "text of comment") String textComment) {
-        return bookCommentConverter.bookCommentToString(bookCommentService.update(id, bookId, textComment));
+    @Command(command = "update", description = "update a Book comment")
+    public String update(@Option(longNames = "id", required = true, arityMin = 1, label = "Book comment ID") long id,
+                         @Option(longNames = "bookId", required = true, arityMin = 1, label = "new Book ID") long bookId,
+                         @Option(longNames = "textComment", required = true, arityMin = 1, label = "new text of comment")
+                         String textComment) {
+        return bookCommentConverter.bookCommentToString(bookCommentService.save(id, bookId, textComment));
     }
 }

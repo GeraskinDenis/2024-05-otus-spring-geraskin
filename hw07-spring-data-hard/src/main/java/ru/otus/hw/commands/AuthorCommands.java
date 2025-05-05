@@ -1,16 +1,14 @@
 package ru.otus.hw.commands;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellOption;
+import org.springframework.shell.command.annotation.Command;
+import org.springframework.shell.command.annotation.Option;
 import ru.otus.hw.converters.AuthorConverter;
-import ru.otus.hw.converters.ReportConverter;
 import ru.otus.hw.services.AuthorService;
 
 import java.util.stream.Collectors;
 
-@ShellComponent
+@Command(command = "author", group = "Author commands")
 @RequiredArgsConstructor
 public class AuthorCommands {
 
@@ -18,41 +16,36 @@ public class AuthorCommands {
 
     private final AuthorConverter authorConverter;
 
-    private final ReportConverter reportConverter;
-
-    @ShellMethod(value = "Delete author by ID", key = "ad")
-    public String delete(@ShellOption(value = "id", help = "author ID to delete") long id) {
+    @Command(command = "del", description = "Remove Author by ID")
+    public String delete(@Option(longNames = "id", required = true, arityMin = 1, label = "Author ID") long id) {
         authorService.deleteById(id);
         return "Deletion Author by ID (%s) completed.".formatted(id);
     }
 
-    @ShellMethod(value = "Find all authors", key = "aa")
+    @Command(command = "find-all", description = "find all Authors")
     public String findAll() {
         return authorService.findAll().stream()
                 .map(authorConverter::authorToString)
                 .collect(Collectors.joining(System.lineSeparator()));
     }
 
-    @ShellMethod(value = "Find author by ID", key = "af")
-    public String findById(@ShellOption(value = "id", help = "author ID for search") long id) {
+    @Command(command = "find", description = "find by ID")
+    public String findById(@Option(longNames = "id", required = true, arityMin = 1, label = "Author ID") long id) {
         return authorService.findById(id)
                 .map(authorConverter::authorToString)
                 .orElse("Author not found by id (%d).".formatted(id));
     }
 
-    @ShellMethod(value = "Get number of books by authors", key = "author-report-1")
-    public String getNumberOfBooksByAuthors() {
-        return reportConverter.reportToString(authorService.getNumberOfBooksByAuthors());
+    @Command(command = "add", description = "add a new Author")
+    public String insert(@Option(longNames = "name", required = true, label = "full name of the new Author")
+                         String fullName) {
+        return authorConverter.authorToString(authorService.save(0L, fullName));
     }
 
-    @ShellMethod(value = "Insert a new author", key = "ai")
-    public String insert(@ShellOption(value = "full_name", help = "full name of the new author") String fullName) {
-        return authorConverter.authorToString(authorService.insert(fullName));
-    }
-
-    @ShellMethod(value = "Update existing author", key = "au")
-    public String update(@ShellOption(value = "id", help = "author ID to update") long id,
-                         @ShellOption(value = "full_name", help = "new full name") String fullName) {
-        return authorConverter.authorToString(authorService.update(id, fullName));
+    @Command(command = "update", description = "update existing Author")
+    public String update(@Option(longNames = "id", required = true, arityMin = 1, label = "Author ID to update")
+                         long id,
+                         @Option(longNames = "name", required = true, label = "new full name") String fullName) {
+        return authorConverter.authorToString(authorService.save(id, fullName));
     }
 }

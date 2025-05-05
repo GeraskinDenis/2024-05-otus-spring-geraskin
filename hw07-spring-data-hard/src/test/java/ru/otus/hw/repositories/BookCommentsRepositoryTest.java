@@ -5,8 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.BookComment;
@@ -21,8 +25,10 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Репозиторий на основе JPA для работы с комментариями книг ")
-@DataJpaTest
-//@Import({BookCommentsRepository.class})
+@SpringBootTest
+@TestPropertySource(properties = {"spring.datasource.url=jdbc:h2:mem:testdb", "spring.shell.interactive.enabled=false"})
+@AutoConfigureTestEntityManager // Добавляем поддержку TestEntityManager
+@Transactional // Откатывает изменения после теста
 class BookCommentsRepositoryTest {
 
     @Autowired
@@ -45,7 +51,7 @@ class BookCommentsRepositoryTest {
     @ParameterizedTest
     @MethodSource("getDbBooks")
     void shouldReturnCorrectBookCommentsListByBookId(Book book) {
-        var actualBookComments = repository.findByBook(book);
+        var actualBookComments = repository.findByBookId(book.getId());
         var expectedBookComments = book.getComments();
         assertThat(actualBookComments).containsExactlyElementsOf(expectedBookComments);
         actualBookComments.forEach(System.out::println);

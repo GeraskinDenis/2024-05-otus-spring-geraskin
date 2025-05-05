@@ -5,19 +5,31 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+// В этом тесте не используется аннотация `@DataJpaTest`,
+// потому что данная аннотация отключает Liquibase
 @DisplayName("Репозиторий на основе JPA для работы с книгами ")
-@DataJpaTest
+@SpringBootTest // поднимает Контекст приложения
+// по умолчанию загружается основная конфигурация `src/main/resource/application.yml`
+// следующая аннотация заменяет / добавляет значения
+@TestPropertySource(properties = {"spring.datasource.url=jdbc:h2:mem:testdb", "spring.shell.interactive.enabled=false"})
+@AutoConfigureTestEntityManager // добавляем `org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager`,
+// который не доступен с аннотацией `@SpringBootTest`, а доступен с аннотацией `@DataJpaTest`
+@Transactional // Откатывает изменения после теста
 class BookRepositoryTest {
 
     @Autowired
@@ -57,7 +69,7 @@ class BookRepositoryTest {
     @DisplayName("should find the book with max id")
     @Test
     void findWithMaxIdTestCase1() {
-        assertThat(repository.findWithMaxId()).isNotEmpty().map(b -> assertThat(b.getId()).isEqualTo(3));
+        assertThat(repository.findWithMaxId()).isNotEmpty().map(b -> assertThat(b.getId()).isEqualTo(5));
     }
 
     @DisplayName("should save the new book correctly")
@@ -101,12 +113,13 @@ class BookRepositoryTest {
     }
 
     private static List<Book> getDbBooks(List<Author> dbAuthors, List<Genre> dbGenres) {
-        return IntStream.range(1, 4).boxed()
-                .map(id -> new Book(id,
-                        "BookTitle_" + id,
-                        dbAuthors.get(id - 1),
-                        dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2)))
-                .toList();
+        List<Book> books = new ArrayList<>();
+        books.add(new Book(1, "BookTitle_1", dbAuthors.get(0), List.of(dbGenres.get(0), dbGenres.get(1))));
+        books.add(new Book(2, "BookTitle_2", dbAuthors.get(1), List.of(dbGenres.get(2), dbGenres.get(3))));
+        books.add(new Book(3, "BookTitle_3", dbAuthors.get(2), List.of(dbGenres.get(4), dbGenres.get(5))));
+        books.add(new Book(4, "BookTitle_4", dbAuthors.get(2), List.of(dbGenres.get(0), dbGenres.get(5))));
+        books.add(new Book(5, "BookTitle_5", dbAuthors.get(2), List.of(dbGenres.get(1), dbGenres.get(3))));
+        return books;
     }
 
     private static List<Book> getDbBooks() {
